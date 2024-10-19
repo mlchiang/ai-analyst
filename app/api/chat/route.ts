@@ -11,10 +11,11 @@ const systemPrompt = `
 You are a sophisticated python data scientist/analyst.
 You are provided with a question and a dataset.
 Generate python code to calculate the result and render a plot.
+You can install additional packages using pip.
 Include the code in the response before executing it.
 Then, execute the code and return the result.
 
-You can use the following libraries:
+The following libraries are available:
 - jupyter
 - numpy
 - pandas
@@ -25,10 +26,20 @@ You can use the following libraries:
 
 export async function POST(req: Request) {
   const { messages }: { messages: Message[] } = await req.json();
+  const filteredMessages = messages.map((message) => {
+    if (message.toolInvocations) {
+      return {
+        ...message,
+        toolInvocations: undefined,
+      };
+    }
+    return message;
+  });
+
   const result = await streamText({
     system: systemPrompt,
     model: openai("gpt-4o"),
-    messages: convertToCoreMessages(messages),
+    messages: convertToCoreMessages(filteredMessages),
     tools: {
       execute_python: {
         description:
@@ -37,21 +48,12 @@ export async function POST(req: Request) {
           code: z
             .string()
             .describe("The python code to execute in a single cell"),
-          install_packages_command: z
-            .string()
-            .optional()
-            .describe("pip command to install additional packages"),
         }),
-        execute: async ({ code, install_packages_command }) => {
+        execute: async ({ code }) => {
           // Create a sandbox, execute LLM-generated code, and return the result
           const sandbox = await Sandbox.create();
-          if (install_packages_command) {
-            console.log("Installing packages:", install_packages_command);
-            await sandbox.runCode(install_packages_command);
-          }
-
           const { text, results, logs, error } = await sandbox.runCode(code);
-          console.log("Results:", text, results, logs, error);
+
           return {
             text,
             results,

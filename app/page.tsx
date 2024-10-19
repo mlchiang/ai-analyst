@@ -5,6 +5,7 @@ import { PlayIcon } from "lucide-react";
 
 export default function Home() {
   const { messages, input, handleInputChange, handleSubmit } = useChat();
+  // console.log(messages);
 
   return (
     <div className="flex flex-col min-h-screen max-h-screen">
@@ -21,7 +22,7 @@ export default function Home() {
         <input
           autoFocus
           required
-          className="w-full p-2"
+          className="w-full p-2 outline-none rounded-md"
           value={input}
           placeholder="Enter your prompt..."
           onChange={handleInputChange}

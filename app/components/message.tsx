@@ -12,7 +12,7 @@ export function MessageComponent({ message }: { message: Message }) {
       className={`${message.role === "user" ? "bg-orange-50" : ""}`}
     >
       <div
-        className={`flex gap-3 mx-auto max-w-2xl py-4 ${
+        className={`flex gap-4 mx-auto w-full max-w-2xl py-4 ${
           message.role === "user" ? "items-center" : ""
         }`}
       >
@@ -23,7 +23,7 @@ export function MessageComponent({ message }: { message: Message }) {
             <BotIcon className="mt-1 w-6 h-6 text-orange-500" />
           )}
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="overflow-hidden flex flex-col gap-2">
           <Markdown
             components={{
               code(props) {
