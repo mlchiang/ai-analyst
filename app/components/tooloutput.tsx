@@ -1,17 +1,17 @@
-import { ToolInvocation } from "ai";
 import { Result } from "@e2b/code-interpreter";
 import { useState } from "react";
 import { Line } from "@nivo/line";
+import { ToolResult } from "../lib/types";
 
 export function ToolOutput({
   result,
 }: {
-  result: ToolInvocation[] | undefined;
+  result: ToolResult | undefined;
 }) {
   const [viewMode, setViewMode] = useState<"static" | "interactive">("static");
 
   if (!result) return null;
-  const toolResult = (result[0] as any).result;
+  const toolResult = result[0].result;
 
   return toolResult !== undefined
     ? toolResult.results.map((result: Result, index: number) => (
@@ -51,9 +51,9 @@ function RenderResult({
     return <img src={`data:image/png;base64,${result.png}`} alt="plot" />;
   }
 
-  if (viewMode === "interactive" && result.extra) {
-    console.log(result.extra.chart);
-    const data = result.extra.chart.elements.map((e: any) => {
+  if (viewMode === "interactive" && result.chart) {
+    console.log(result.chart);
+    const data = result.chart.elements.map((e) => {
       return {
         id: e.label,
         data: e.points.map((p: [number, number]) => ({ x: p[0], y: p[1] })),

@@ -4,6 +4,7 @@ import Markdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { ToolOutput } from "./tooloutput";
+import { ToolResult } from "../lib/types";
 
 export function MessageComponent({ message }: { message: Message }) {
   return (
@@ -48,7 +49,7 @@ export function MessageComponent({ message }: { message: Message }) {
           >
             {message.content}
           </Markdown>
-          <ToolOutput result={message.toolInvocations} />
+          <ToolOutput result={message.toolInvocations as ToolResult} />
         </div>
       </div>
     </div>

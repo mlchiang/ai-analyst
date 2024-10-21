@@ -1,6 +1,6 @@
 import { anthropic } from "@ai-sdk/anthropic";
 // import { openai } from "@ai-sdk/openai";
-import { streamText, convertToCoreMessages, Message } from "ai";
+import { streamText, convertToCoreMessages, Message, tool } from "ai";
 import { z } from "zod";
 import { Sandbox } from "@e2b/code-interpreter";
 
@@ -41,7 +41,7 @@ export async function POST(req: Request) {
     model: anthropic("claude-3-5-sonnet-20240620"),
     messages: convertToCoreMessages(filteredMessages),
     tools: {
-      execute_python: {
+      execute_python: tool({
         description:
           "Execute python code in a Jupyter notebook cell and return result",
         parameters: z.object({
@@ -63,7 +63,7 @@ export async function POST(req: Request) {
             error,
           };
         },
-      },
+      }),
     },
   });
 
