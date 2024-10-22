@@ -4,6 +4,7 @@ import {
   LineChart,
   PieChart,
   Result,
+  ScatterChart,
 } from "@e2b/code-interpreter";
 import { useState } from "react";
 import { ToolResult } from "../lib/types";
@@ -70,7 +71,38 @@ function RenderResult({
         },
         grid: { top: 8, right: 8, bottom: 24, left: 36 },
         xAxis: {
-          type: "category",
+          name: chart.x_label,
+          nameLocation: "middle",
+        },
+        yAxis: {
+          name: chart.y_label,
+          nameLocation: "middle",
+        },
+        legend: {},
+        series,
+        tooltip: {
+          trigger: "axis",
+        },
+      };
+
+      return <ReactECharts option={options} />;
+    }
+
+    if (chart.type === "scatter") {
+      const series = (chart as ScatterChart).elements.map((e) => {
+        return {
+          name: e.label,
+          type: "scatter",
+          data: e.points.map((p: [number, number]) => [p[0], p[1]]),
+        };
+      });
+
+      const options: EChartsOption = {
+        title: {
+          text: chart.title,
+        },
+        grid: { top: 8, right: 8, bottom: 24, left: 36 },
+        xAxis: {
           name: chart.x_label,
           nameLocation: "middle",
         },
