@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^0.0.51",
     "@ai-sdk/openai": "^0.0.68",
     "@e2b/code-interpreter": "^1.0.2",
     "@nivo/line": "^0.87.0",

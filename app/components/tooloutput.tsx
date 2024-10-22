@@ -52,7 +52,6 @@ function RenderResult({
   }
 
   if (viewMode === "interactive" && result.chart) {
-    console.log(result.chart);
     const data = result.chart.elements.map((e) => {
       return {
         id: e.label,

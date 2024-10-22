@@ -2,10 +2,35 @@
 import { useChat } from "ai/react";
 import { MessageComponent } from "./components/message";
 import { PlayIcon } from "lucide-react";
+import { extractCodeFromText } from "./lib/code";
+import { runCode } from "./actions/sandbox";
 
 export default function Home() {
-  const { messages, input, handleInputChange, handleSubmit } = useChat();
-  // console.log(messages);
+  const { messages, input, handleInputChange, handleSubmit, setMessages } =
+    useChat({
+      // Fake tool call
+      onFinish: async (message) => {
+        const code = extractCodeFromText(message.content);
+        if (!code) return;
+        const { text, results, logs, error } = await runCode(code);
+
+        // add tool call result to the last message
+        message.toolInvocations = [
+          {
+            state: "result",
+            toolCallId: message.id,
+            toolName: "runCode",
+            args: code,
+            result: { text, results, logs, error },
+          },
+        ];
+
+        setMessages((prev) => {
+          // replace last message with the new message
+          return [...prev.slice(0, -1), message];
+        });
+      },
+    });
 
   return (
     <div className="flex flex-col min-h-screen max-h-screen">
