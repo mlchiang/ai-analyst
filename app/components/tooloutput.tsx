@@ -56,12 +56,9 @@ function RenderResult({
     if (chart.type === "line") {
       const data = (chart as LineChartType).elements.map((e) => {
         return {
-          label: e.label,
+          name: e.label,
           type: "line",
-          data: e.points.map((p: [number, number]) => ({
-            x: p[0],
-            y: p[1],
-          })),
+          data: e.points.map((p: [number, number]) => ([p[0], p[1]])),
         };
       });
 
@@ -73,7 +70,6 @@ function RenderResult({
         xAxis: {
           type: "category",
           name: chart.x_label,
-          data: data[0].data.map((d: { x: number }) => d.x),
           nameLocation: "middle",
         },
         yAxis: {
@@ -81,11 +77,7 @@ function RenderResult({
           nameLocation: "middle",
         },
         legend: {},
-        series: data.map((d) => ({
-          name: d.label,
-          data: d.data.map((d: { y: number }) => d.y),
-          type: d.type,
-        })),
+        series: data,
         tooltip: {
           trigger: "axis",
         },
