@@ -1,8 +1,4 @@
-import {
-  ChartType,
-  LineChart as LineChartType,
-  Result,
-} from "@e2b/code-interpreter";
+import { BarChart, ChartType, LineChart, Result } from "@e2b/code-interpreter";
 import { useState } from "react";
 import { ToolResult } from "../lib/types";
 import ReactECharts, { EChartsOption } from "echarts-for-react";
@@ -54,11 +50,11 @@ function RenderResult({
   if (viewMode === "interactive" && result.extra.chart) {
     const chart = result.extra.chart;
     if (chart.type === "line") {
-      const data = (chart as LineChartType).elements.map((e) => {
+      const series = (chart as LineChart).elements.map((e) => {
         return {
           name: e.label,
           type: "line",
-          data: e.points.map((p: [number, number]) => ([p[0], p[1]])),
+          data: e.points.map((p: [number, number]) => [p[0], p[1]]),
         };
       });
 
@@ -77,7 +73,44 @@ function RenderResult({
           nameLocation: "middle",
         },
         legend: {},
-        series: data,
+        series,
+        tooltip: {
+          trigger: "axis",
+        },
+      };
+
+      return <ReactECharts option={options} />;
+    }
+
+    if (chart.type === "bar") {
+      const data = Object.groupBy(
+        (chart as BarChart).elements,
+        ({ group }) => group
+      );
+
+      const series = Object.entries(data).map(([group, elements]) => ({
+        name: group,
+        type: "bar",
+        stack: "total",
+        data: elements?.map((e) => [e.label, e.value]),
+      }));
+
+      const options: EChartsOption = {
+        title: {
+          text: chart.title,
+        },
+        grid: { top: 8, right: 8, bottom: 24, left: 36 },
+        xAxis: {
+          type: "category",
+          name: chart.x_label,
+          nameLocation: "middle",
+        },
+        yAxis: {
+          name: chart.y_label,
+          nameLocation: "middle",
+        },
+        legend: {},
+        series,
         tooltip: {
           trigger: "axis",
         },
