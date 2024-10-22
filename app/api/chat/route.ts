@@ -10,16 +10,15 @@ const systemPrompt = `
 You are a sophisticated python data scientist/analyst.
 You are provided with a question and a dataset.
 Generate python code to be run in a Jupyter notebook cell that calculates the result and renders a plot.
+You can install additional packages using pip (Jupyter notebook syntax).
 
-The following libraries are available:
+The following libraries are already installed:
 - jupyter
 - numpy
 - pandas
 - matplotlib
 - seaborn
 - plotly
-
-You can install additional packages using pip (Jupyter notebook syntax).
 `;
 
 export async function POST(req: Request) {
@@ -50,7 +49,7 @@ export async function POST(req: Request) {
     //     }),
     //     execute: async ({ code }) => {
     //       // Create a sandbox, execute LLM-generated code, and return the result
-    //       console.log("Executing code");
+    //       console.log("Executing code", code);
     //       const sandbox = await Sandbox.create();
     //       const { text, results, logs, error } = await sandbox.runCode(code);
     //       console.log(text, results, logs, error);

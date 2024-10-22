@@ -3,7 +3,6 @@ import { useChat } from "ai/react";
 import { MessageComponent } from "./components/message";
 import { PlayIcon } from "lucide-react";
 import { extractCodeFromText } from "./lib/code";
-import { runCode } from "./actions/sandbox";
 
 export default function Home() {
   const { messages, input, handleInputChange, handleSubmit, setMessages } =
@@ -12,7 +11,13 @@ export default function Home() {
       onFinish: async (message) => {
         const code = extractCodeFromText(message.content);
         if (!code) return;
-        const { text, results, logs, error } = await runCode(code);
+
+        const res = await fetch("/api/sandbox", {
+          method: "POST",
+          body: JSON.stringify({ code }),
+        });
+
+        const result = await res.json();
 
         // add tool call result to the last message
         message.toolInvocations = [
@@ -21,7 +26,7 @@ export default function Home() {
             toolCallId: message.id,
             toolName: "runCode",
             args: code,
-            result: { text, results, logs, error },
+            result,
           },
         ];
 
