@@ -1,11 +1,4 @@
-import {
-  BarChart,
-  ChartType,
-  LineChart,
-  PieChart,
-  Result,
-  ScatterChart,
-} from "@e2b/code-interpreter";
+import { ChartTypes, Result } from "@e2b/code-interpreter";
 import { useState } from "react";
 import { ToolResult } from "../lib/types";
 import ReactECharts, { EChartsOption } from "echarts-for-react";
@@ -54,138 +47,138 @@ function RenderResult({
     return <img src={`data:image/png;base64,${result.png}`} alt="plot" />;
   }
 
-  if (viewMode === "interactive" && result.extra.chart) {
-    const chart = result.extra.chart;
-    if (chart.type === "line") {
-      const series = (chart as LineChart).elements.map((e) => {
-        return {
-          name: e.label,
-          type: "line",
-          data: e.points.map((p: [number, number]) => [p[0], p[1]]),
-        };
-      });
-
-      const options: EChartsOption = {
-        title: {
-          text: chart.title,
-        },
-        grid: { top: 8, right: 8, bottom: 24, left: 36 },
-        xAxis: {
-          name: chart.x_label,
-          nameLocation: "middle",
-        },
-        yAxis: {
-          name: chart.y_label,
-          nameLocation: "middle",
-        },
-        legend: {},
-        series,
-        tooltip: {
-          trigger: "axis",
-        },
-      };
-
-      return <ReactECharts option={options} />;
-    }
-
-    if (chart.type === "scatter") {
-      const series = (chart as ScatterChart).elements.map((e) => {
-        return {
-          name: e.label,
-          type: "scatter",
-          data: e.points.map((p: [number, number]) => [p[0], p[1]]),
-        };
-      });
-
-      const options: EChartsOption = {
-        title: {
-          text: chart.title,
-        },
-        grid: { top: 8, right: 8, bottom: 24, left: 36 },
-        xAxis: {
-          name: chart.x_label,
-          nameLocation: "middle",
-        },
-        yAxis: {
-          name: chart.y_label,
-          nameLocation: "middle",
-        },
-        legend: {},
-        series,
-        tooltip: {
-          trigger: "axis",
-        },
-      };
-
-      return <ReactECharts option={options} />;
-    }
-
-    if (chart.type === "bar") {
-      const data = Object.groupBy(
-        (chart as BarChart).elements,
-        ({ group }) => group
-      );
-
-      const series = Object.entries(data).map(([group, elements]) => ({
-        name: group,
-        type: "bar",
-        stack: "total",
-        data: elements?.map((e) => [e.label, e.value]),
-      }));
-
-      const options: EChartsOption = {
-        title: {
-          text: chart.title,
-        },
-        grid: { top: 8, right: 8, bottom: 24, left: 36 },
-        xAxis: {
-          type: "category",
-          name: chart.x_label,
-          nameLocation: "middle",
-        },
-        yAxis: {
-          name: chart.y_label,
-          nameLocation: "middle",
-        },
-        legend: {},
-        series,
-        tooltip: {
-          trigger: "axis",
-        },
-      };
-
-      return <ReactECharts option={options} />;
-    }
-
-    if (chart.type === "pie") {
-      const options: EChartsOption = {
-        title: {
-          text: chart.title,
-        },
-        tooltip: {
-          trigger: "item",
-        },
-        legend: {},
-        series: [
-          {
-            type: "pie",
-            data: (chart as PieChart).elements.map((e) => ({
-              value: e.angle,
-              name: e.label,
-            })),
-          },
-        ],
-      };
-
-      return <ReactECharts option={options} />;
-    }
-
-    // if (chart.type === "superchart") {
-    //   return chart.elements.map((e) => {
-    //     return <RenderResult result={e} viewMode={viewMode} />;
-    //   });
-    // }
+  if (viewMode === "interactive" && result.extra?.chart) {
+    return <Chart chart={result.extra.chart} />;
   }
 
   return <pre>{JSON.stringify(result, null, 2)}</pre>;
+}
+
+function Chart({ chart }: { chart: ChartTypes }) {
+  if (chart.type === "line") {
+    const series = chart.elements.map((e) => {
+      return {
+        name: e.label,
+        type: "line",
+        data: e.points.map((p: [number, number]) => [p[0], p[1]]),
+      };
+    });
+
+    const options: EChartsOption = {
+      title: {
+        text: chart.title,
+      },
+      grid: { top: 8, right: 8, bottom: 24, left: 36 },
+      xAxis: {
+        name: chart.x_label,
+        nameLocation: "middle",
+      },
+      yAxis: {
+        name: chart.y_label,
+        nameLocation: "middle",
+      },
+      legend: {},
+      series,
+      tooltip: {
+        trigger: "axis",
+      },
+    };
+
+    return <ReactECharts option={options} />;
+  }
+
+  if (chart.type === "scatter") {
+    const series = chart.elements.map((e) => {
+      return {
+        name: e.label,
+        type: "scatter",
+        data: e.points.map((p: [number, number]) => [p[0], p[1]]),
+      };
+    });
+
+    const options: EChartsOption = {
+      title: {
+        text: chart.title,
+      },
+      grid: { top: 8, right: 8, bottom: 24, left: 36 },
+      xAxis: {
+        name: chart.x_label,
+        nameLocation: "middle",
+      },
+      yAxis: {
+        name: chart.y_label,
+        nameLocation: "middle",
+      },
+      legend: {},
+      series,
+      tooltip: {
+        trigger: "axis",
+      },
+    };
+
+    return <ReactECharts option={options} />;
+  }
+
+  if (chart.type === "bar") {
+    const data = Object.groupBy(chart.elements, ({ group }) => group);
+
+    const series = Object.entries(data).map(([group, elements]) => ({
+      name: group,
+      type: "bar",
+      stack: "total",
+      data: elements?.map((e) => [e.label, e.value]),
+    }));
+
+    const options: EChartsOption = {
+      title: {
+        text: chart.title,
+      },
+      grid: { top: 8, right: 8, bottom: 24, left: 36 },
+      xAxis: {
+        type: "category",
+        name: chart.x_label,
+        nameLocation: "middle",
+      },
+      yAxis: {
+        name: chart.y_label,
+        nameLocation: "middle",
+      },
+      legend: {},
+      series,
+      tooltip: {
+        trigger: "axis",
+      },
+    };
+
+    return <ReactECharts option={options} />;
+  }
+
+  if (chart.type === "pie") {
+    const options: EChartsOption = {
+      title: {
+        text: chart.title,
+      },
+      tooltip: {
+        trigger: "item",
+      },
+      legend: {},
+      series: [
+        {
+          type: "pie",
+          data: chart.elements.map((e) => ({
+            value: e.angle,
+            name: e.label,
+          })),
+        },
+      ],
+    };
+
+    return <ReactECharts option={options} />;
+  }
+
+  if (chart.type === "superchart") {
+    return chart.elements.map((e) => {
+      return <Chart chart={e} />;
+    });
+  }
 }
