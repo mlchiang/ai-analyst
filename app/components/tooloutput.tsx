@@ -70,6 +70,7 @@ function Chart({ chart }: { chart: ChartTypes }) {
       },
       grid: { top: 8, right: 8, bottom: 24, left: 36 },
       xAxis: {
+        type: "category",
         name: chart.x_label,
         nameLocation: "middle",
       },
@@ -104,10 +105,14 @@ function Chart({ chart }: { chart: ChartTypes }) {
       xAxis: {
         name: chart.x_label,
         nameLocation: "middle",
+        min: "dataMin",
+        max: "dataMax",
       },
       yAxis: {
         name: chart.y_label,
         nameLocation: "middle",
+        min: "dataMin",
+        max: "dataMax",
       },
       legend: {},
       series,
@@ -176,9 +181,45 @@ function Chart({ chart }: { chart: ChartTypes }) {
     return <ReactECharts option={options} />;
   }
 
+  if (chart.type === "box_and_whisker") {
+    const series = chart.elements.map((e) => {
+      return {
+        name: e.label,
+        type: "boxplot",
+        data: [[e.min, e.first_quartile, e.median, e.third_quartile, e.max]],
+      };
+    });
+
+    const options: EChartsOption = {
+      title: {
+        text: chart.title,
+      },
+      xAxis: {
+        type: "category",
+        name: chart.x_label,
+        nameLocation: "middle",
+      },
+      yAxis: {
+        name: chart.y_label,
+        nameLocation: "middle",
+        min: "dataMin",
+        max: "dataMax",
+      },
+      legend: {},
+      series,
+      tooltip: {
+        trigger: "item",
+      },
+    };
+
+    return <ReactECharts option={options} />;
+  }
+
   if (chart.type === "superchart") {
     return chart.elements.map((e) => {
       return <Chart chart={e} />;
     });
   }
+
+  return <pre>{JSON.stringify(chart, null, 2)}</pre>;
 }
