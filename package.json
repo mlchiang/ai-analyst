@@ -11,7 +11,6 @@
   "dependencies": {
     "@ai-sdk/openai": "^0.0.68",
     "@e2b/code-interpreter": "^1.0.2",
-    "@nivo/line": "^0.87.0",
     "@types/react-syntax-highlighter": "^15.5.13",
     "ai": "^3.4.16",
     "install": "^0.13.0",
@@ -22,6 +21,7 @@
     "react-dom": "^18",
     "react-markdown": "^9.0.1",
     "react-syntax-highlighter": "^15.6.1",
+    "recharts": "^2.13.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
