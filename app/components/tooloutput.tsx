@@ -216,8 +216,8 @@ function Chart({ chart }: { chart: ChartTypes }) {
   }
 
   if (chart.type === "superchart") {
-    return chart.elements.map((e) => {
-      return <Chart chart={e} />;
+    return chart.elements.map((e, index) => {
+      return <Chart chart={e} key={index} />;
     });
   }
 
