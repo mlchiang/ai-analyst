@@ -5,16 +5,7 @@ import {
 } from "@e2b/code-interpreter";
 import { useState } from "react";
 import { ToolResult } from "../lib/types";
-import {
-  CartesianGrid,
-  Legend,
-  LineChart,
-  Line,
-  Tooltip,
-  XAxis,
-  YAxis,
-  Label,
-} from "recharts";
+import ReactECharts, { EChartsOption } from "echarts-for-react";
 
 export function ToolOutput({ result }: { result: ToolResult | undefined }) {
   const [viewMode, setViewMode] = useState<"static" | "interactive">("static");
@@ -64,46 +55,43 @@ function RenderResult({
     const chart = result.extra.chart;
     if (chart.type === "line") {
       const data = (chart as LineChartType).elements.map((e) => {
-        return e.points.map((p: [number, number]) => ({
-          x: p[0],
-          y: p[1],
-        }));
+        return {
+          label: e.label,
+          type: "line",
+          data: e.points.map((p: [number, number]) => ({
+            x: p[0],
+            y: p[1],
+          })),
+        };
       });
 
-      return (
-        <LineChart height={400} width={600} data={data[0]}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis
-            dataKey="x"
-            scale={chart.x_scale}
-            label={{
-              value: chart.x_label,
-              position: "left",
-              offset: 10,
-            }}
-          />
-          <YAxis
-            label={{
-              value: chart.y_label,
-              position: "left",
-              offset: 0,
-              angle: -90,
-            }}
-            scale={chart.y_scale}
-          />
-          <Tooltip />
-          <Legend
-            verticalAlign="top"
-            height={36}
-            content={
-              <p className="text-sm font-semibold text-gray-800">
-                {chart.title}
-              </p>
-            }
-          />
-          <Line name={chart.y_label} type="monotone" dataKey="y" />
-        </LineChart>
-      );
+      const options: EChartsOption = {
+        title: {
+          text: chart.title,
+        },
+        grid: { top: 8, right: 8, bottom: 24, left: 36 },
+        xAxis: {
+          type: "category",
+          name: chart.x_label,
+          data: data[0].data.map((d: { x: number }) => d.x),
+          nameLocation: "middle",
+        },
+        yAxis: {
+          name: chart.y_label,
+          nameLocation: "middle",
+        },
+        legend: {},
+        series: data.map((d) => ({
+          name: d.label,
+          data: d.data.map((d: { y: number }) => d.y),
+          type: d.type,
+        })),
+        tooltip: {
+          trigger: "axis",
+        },
+      };
+
+      return <ReactECharts option={options} />;
     }
 
     // if (chart.type === "superchart") {
