@@ -1,4 +1,10 @@
-import { BarChart, ChartType, LineChart, Result } from "@e2b/code-interpreter";
+import {
+  BarChart,
+  ChartType,
+  LineChart,
+  PieChart,
+  Result,
+} from "@e2b/code-interpreter";
 import { useState } from "react";
 import { ToolResult } from "../lib/types";
 import ReactECharts, { EChartsOption } from "echarts-for-react";
@@ -114,6 +120,29 @@ function RenderResult({
         tooltip: {
           trigger: "axis",
         },
+      };
+
+      return <ReactECharts option={options} />;
+    }
+
+    if (chart.type === "pie") {
+      const options: EChartsOption = {
+        title: {
+          text: chart.title,
+        },
+        tooltip: {
+          trigger: "item",
+        },
+        legend: {},
+        series: [
+          {
+            type: "pie",
+            data: (chart as PieChart).elements.map((e) => ({
+              value: e.angle,
+              name: e.label,
+            })),
+          },
+        ],
       };
 
       return <ReactECharts option={options} />;
