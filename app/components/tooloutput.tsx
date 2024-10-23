@@ -25,7 +25,7 @@ export function ToolOutput({ result }: { result: ToolResult | undefined }) {
   }
 
   return toolResult.results.map((result: Result, index: number) => (
-    <div key={index} className="mt-2 flex flex-col border rounded-xl shadow-sm">
+    <div key={index} className="flex flex-col border rounded-xl shadow-sm">
       <div className="flex items-center justify-between p-2">
         <div className="p-2 font-semibold text-gray-800 text-sm flex items-center gap-2">
           <ChartNoAxesCombined className="w-4 h-4" />

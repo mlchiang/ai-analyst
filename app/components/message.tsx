@@ -24,7 +24,7 @@ export function MessageComponent({ message }: { message: Message }) {
             <BotIcon className="mt-1 w-6 h-6 text-orange-500" />
           )}
         </div>
-        <div className="overflow-hidden flex flex-col gap-2">
+        <div className="overflow-hidden flex-1 flex flex-col gap-2">
           <Markdown
             components={{
               code(props) {
