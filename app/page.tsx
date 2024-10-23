@@ -18,38 +18,44 @@ export default function Home() {
     };
   });
 
-  const { messages, input, handleInputChange, handleSubmit, setMessages } =
-    useChat({
-      // Fake tool call
-      onFinish: async (message) => {
-        const code = extractCodeFromText(message.content);
-        if (!code) return;
+  const {
+    messages,
+    input,
+    handleInputChange,
+    handleSubmit,
+    setMessages,
+    isLoading,
+  } = useChat({
+    // Fake tool call
+    onFinish: async (message) => {
+      const code = extractCodeFromText(message.content);
+      if (!code) return;
 
-        const res = await fetch("/api/sandbox", {
-          method: "POST",
-          body: JSON.stringify({ code, files: await Promise.all(filesData) }),
-        });
+      const res = await fetch("/api/sandbox", {
+        method: "POST",
+        body: JSON.stringify({ code, files: await Promise.all(filesData) }),
+      });
 
-        const result = await res.json();
+      const result = await res.json();
 
-        // add tool call result to the last message
-        message.toolInvocations = [
-          {
-            state: "result",
-            toolCallId: message.id,
-            toolName: "runCode",
-            args: code,
-            result,
-          },
-        ];
+      // add tool call result to the last message
+      message.toolInvocations = [
+        {
+          state: "result",
+          toolCallId: message.id,
+          toolName: "runCode",
+          args: code,
+          result,
+        },
+      ];
 
-        setFiles([]);
-        setMessages((prev) => {
-          // replace last message with the new message
-          return [...prev.slice(0, -1), message];
-        });
-      },
-    });
+      setFiles([]);
+      setMessages((prev) => {
+        // replace last message with the new message
+        return [...prev.slice(0, -1), message];
+      });
+    },
+  });
 
   useEffect(() => {
     const messagesElement = document.getElementById("messages");
@@ -111,10 +117,14 @@ export default function Home() {
               >
                 <FileText className="w-4 h-4" />
                 <span className="text-sm truncate">{file.name}</span>
-                <X
-                  className="w-4 h-4 cursor-pointer"
+                <button
+                  type="button"
                   onClick={() => handleFileRemove(file)}
-                />
+                  className="cursor-pointer"
+                  disabled={isLoading}
+                >
+                  <X className="w-4 h-4" />
+                </button>
               </div>
             ))}
           </div>
