@@ -1,29 +1,16 @@
 // import { z } from "zod";
 // import { Sandbox } from "@e2b/code-interpreter";
-import { getModel } from "@/app/lib/models";
+import { model } from "@/app/lib/models";
+import { systemPrompt } from "@/app/lib/prompt";
 import { streamText, convertToCoreMessages, Message } from "ai";
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
-const systemPrompt = `
-You are a sophisticated python data scientist/analyst.
-You are provided with a question and a dataset.
-Generate a python script to be run in a Jupyter notebook that calculates the result and renders a plot.
-Only one code block is allowed.
-Install additional packages using !pip syntax.
-
-The following libraries are already installed:
-- jupyter
-- numpy
-- pandas
-- matplotlib
-- seaborn
-- plotly
-`;
-
 export async function POST(req: Request) {
   const { messages }: { messages: Message[] } = await req.json();
+
+  // Filter out tool invocations
   const filteredMessages = messages.map((message) => {
     if (message.toolInvocations) {
       return {
@@ -36,7 +23,7 @@ export async function POST(req: Request) {
 
   const result = await streamText({
     system: systemPrompt,
-    model: getModel("fireworks"),
+    model,
     messages: convertToCoreMessages(filteredMessages),
     // If the provider supports tooling, uncomment below
     // tools: {

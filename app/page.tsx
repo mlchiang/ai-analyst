@@ -64,26 +64,28 @@ export default function Home() {
         ))}
       </div>
 
-      <div className="mx-auto w-full max-w-2xl mb-4">
-        <form
-          onSubmit={handleSubmit}
-          className="flex border p-1 border-1.5 border-orange-400 rounded-xl overflow-hidden shadow-md"
-        >
-          <input
-            autoFocus
-            required
-            className="w-full px-2 outline-none"
-            value={input}
-            placeholder="Enter your prompt..."
-            onChange={handleInputChange}
-          />
-          <button
-            type="submit"
-            className="bg-orange-500 text-white p-1.5 rounded-lg hover:bg-orange-500/80"
+      <div className="mb-4 mx-4">
+        <div className="mx-auto w-full max-w-2xl">
+          <form
+            onSubmit={handleSubmit}
+            className="flex border p-1 border-1.5 border-orange-400 rounded-xl overflow-hidden shadow-md"
           >
-            <PlayIcon />
-          </button>
-        </form>
+            <input
+              autoFocus
+              required
+              className="w-full px-2 outline-none"
+              value={input}
+              placeholder="Enter your prompt..."
+              onChange={handleInputChange}
+            />
+            <button
+              type="submit"
+              className="bg-orange-500 text-white p-1.5 rounded-lg hover:bg-orange-500/80"
+            >
+              <PlayIcon />
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

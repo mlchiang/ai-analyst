@@ -14,3 +14,5 @@ const providerConfigs = {
 export function getModel(provider: keyof typeof providerConfigs) {
   return providerConfigs[provider];
 }
+
+export const model = getModel("fireworks");
