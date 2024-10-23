@@ -9,7 +9,7 @@ export const maxDuration = 30;
 const systemPrompt = `
 You are a sophisticated python data scientist/analyst.
 You are provided with a question and a dataset.
-Generate python code to be run in a Jupyter notebook cell that calculates the result and renders a plot.
+Generate a python code snippet to be run in a Jupyter notebook that calculates the result and renders a plot.
 You can install additional packages using pip (Jupyter notebook syntax).
 
 The following libraries are already installed:

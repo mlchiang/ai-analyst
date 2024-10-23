@@ -4,7 +4,7 @@ import { ToolResult } from "../lib/types";
 import ReactECharts, { EChartsOption } from "echarts-for-react";
 
 export function ToolOutput({ result }: { result: ToolResult | undefined }) {
-  const [viewMode, setViewMode] = useState<"static" | "interactive">("static");
+  const [viewMode, setViewMode] = useState<"static" | "interactive">("interactive");
 
   if (!result) return null;
   const toolResult = result[0].result;
@@ -55,6 +55,21 @@ function RenderResult({
 }
 
 function Chart({ chart }: { chart: ChartTypes }) {
+  const sharedOptions: EChartsOption = {
+    title: {
+      text: chart.title,
+      left: "center",
+      textStyle: {
+        fontSize: 14,
+      },
+    },
+    grid: { top: 30, right: 8, bottom: 28, left: 28 },
+    legend: {
+      left: "right",
+      orient: "vertical",
+    },
+  };
+
   if (chart.type === "line") {
     const series = chart.elements.map((e) => {
       return {
@@ -65,10 +80,7 @@ function Chart({ chart }: { chart: ChartTypes }) {
     });
 
     const options: EChartsOption = {
-      title: {
-        text: chart.title,
-      },
-      grid: { top: 8, right: 8, bottom: 24, left: 36 },
+      ...sharedOptions,
       xAxis: {
         type: "category",
         name: chart.x_label,
@@ -78,7 +90,6 @@ function Chart({ chart }: { chart: ChartTypes }) {
         name: chart.y_label,
         nameLocation: "middle",
       },
-      legend: {},
       series,
       tooltip: {
         trigger: "axis",
@@ -98,23 +109,15 @@ function Chart({ chart }: { chart: ChartTypes }) {
     });
 
     const options: EChartsOption = {
-      title: {
-        text: chart.title,
-      },
-      grid: { top: 8, right: 8, bottom: 24, left: 36 },
+      ...sharedOptions,
       xAxis: {
         name: chart.x_label,
         nameLocation: "middle",
-        min: "dataMin",
-        max: "dataMax",
       },
       yAxis: {
         name: chart.y_label,
         nameLocation: "middle",
-        min: "dataMin",
-        max: "dataMax",
       },
-      legend: {},
       series,
       tooltip: {
         trigger: "axis",
@@ -135,10 +138,7 @@ function Chart({ chart }: { chart: ChartTypes }) {
     }));
 
     const options: EChartsOption = {
-      title: {
-        text: chart.title,
-      },
-      grid: { top: 8, right: 8, bottom: 24, left: 36 },
+      ...sharedOptions,
       xAxis: {
         type: "category",
         name: chart.x_label,
@@ -148,7 +148,6 @@ function Chart({ chart }: { chart: ChartTypes }) {
         name: chart.y_label,
         nameLocation: "middle",
       },
-      legend: {},
       series,
       tooltip: {
         trigger: "axis",
@@ -160,13 +159,10 @@ function Chart({ chart }: { chart: ChartTypes }) {
 
   if (chart.type === "pie") {
     const options: EChartsOption = {
-      title: {
-        text: chart.title,
-      },
+      ...sharedOptions,
       tooltip: {
         trigger: "item",
       },
-      legend: {},
       series: [
         {
           type: "pie",
@@ -191,9 +187,7 @@ function Chart({ chart }: { chart: ChartTypes }) {
     });
 
     const options: EChartsOption = {
-      title: {
-        text: chart.title,
-      },
+      ...sharedOptions,
       xAxis: {
         type: "category",
         name: chart.x_label,
@@ -205,7 +199,6 @@ function Chart({ chart }: { chart: ChartTypes }) {
         min: "dataMin",
         max: "dataMax",
       },
-      legend: {},
       series,
       tooltip: {
         trigger: "item",
@@ -216,9 +209,15 @@ function Chart({ chart }: { chart: ChartTypes }) {
   }
 
   if (chart.type === "superchart") {
-    return chart.elements.map((e, index) => {
-      return <Chart chart={e} key={index} />;
-    });
+    return (
+      <div className="grid grid-cols-2 gap-4">
+        {chart.elements.map((e, index) => (
+          <div key={index}>
+            <Chart chart={e} />
+          </div>
+        ))}
+      </div>
+    );
   }
 
   return <pre>{JSON.stringify(chart, null, 2)}</pre>;
