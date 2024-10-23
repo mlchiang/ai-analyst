@@ -1,224 +1,55 @@
-import { ChartTypes, Result } from "@e2b/code-interpreter";
+import { Result } from "@e2b/code-interpreter";
 import { useState } from "react";
 import { ToolResult } from "../lib/types";
-import ReactECharts, { EChartsOption } from "echarts-for-react";
+import { RenderResult } from "./charts";
+import { ChartNoAxesCombined } from "lucide-react";
 
 export function ToolOutput({ result }: { result: ToolResult | undefined }) {
-  const [viewMode, setViewMode] = useState<"static" | "interactive">("interactive");
+  const [viewMode, setViewMode] = useState<"static" | "interactive">(
+    "interactive"
+  );
 
   if (!result) return null;
-  const toolResult = result[0].result;
+  const toolResult = result.find((r) => r.toolName === "runCode")?.result;
 
   return toolResult !== undefined
     ? toolResult.results.map((result: Result, index: number) => (
-        <div key={index} className="flex flex-col gap-2">
-          <div className="flex justify-end">
-            <button
-              className={`px-2 border-b font-semibold text-sm ${
-                viewMode === "static" ? "border-orange-500" : ""
-              }`}
-              onClick={() => setViewMode("static")}
-            >
-              Static
-            </button>
-            <button
-              className={`px-2 border-b font-semibold text-sm ${
-                viewMode === "interactive" ? "border-orange-500" : ""
-              }`}
-              onClick={() => setViewMode("interactive")}
-            >
-              Interactive
-            </button>
+        <div
+          key={index}
+          className="mt-2 flex flex-col border rounded-xl shadow-sm"
+        >
+          <div className="flex items-center justify-between p-2">
+            <div className="p-2 font-semibold text-gray-800 text-sm flex items-center gap-2">
+              <ChartNoAxesCombined className="w-4 h-4" />
+              {result.extra?.chart.title}
+            </div>
+            <div className="flex justify-end border rounded-lg overflow-hidden">
+              <button
+                className={`px-3 py-2 font-semibold text-sm ${
+                  viewMode === "static"
+                    ? "bg-orange-500/10 text-orange-500"
+                    : ""
+                }`}
+                onClick={() => setViewMode("static")}
+              >
+                Static
+              </button>
+              <button
+                className={`px-3 py-2 font-semibold text-sm ${
+                  viewMode === "interactive"
+                    ? "bg-orange-500/10 text-orange-500"
+                    : ""
+                }`}
+                onClick={() => setViewMode("interactive")}
+              >
+                Interactive
+              </button>
+            </div>
           </div>
-          <RenderResult result={result} viewMode={viewMode} />
+          <div className="p-4">
+            <RenderResult result={result} viewMode={viewMode} />
+          </div>
         </div>
       ))
     : null;
-}
-
-function RenderResult({
-  result,
-  viewMode,
-}: {
-  result: Result;
-  viewMode: "static" | "interactive";
-}) {
-  if (viewMode === "static" && result.png) {
-    return <img src={`data:image/png;base64,${result.png}`} alt="plot" />;
-  }
-
-  if (viewMode === "interactive" && result.extra?.chart) {
-    return <Chart chart={result.extra.chart} />;
-  }
-
-  return <pre>{JSON.stringify(result, null, 2)}</pre>;
-}
-
-function Chart({ chart }: { chart: ChartTypes }) {
-  const sharedOptions: EChartsOption = {
-    title: {
-      text: chart.title,
-      left: "center",
-      textStyle: {
-        fontSize: 14,
-      },
-    },
-    grid: { top: 30, right: 8, bottom: 28, left: 28 },
-    legend: {
-      left: "right",
-      orient: "vertical",
-    },
-  };
-
-  if (chart.type === "line") {
-    const series = chart.elements.map((e) => {
-      return {
-        name: e.label,
-        type: "line",
-        data: e.points.map((p: [number, number]) => [p[0], p[1]]),
-      };
-    });
-
-    const options: EChartsOption = {
-      ...sharedOptions,
-      xAxis: {
-        type: "category",
-        name: chart.x_label,
-        nameLocation: "middle",
-      },
-      yAxis: {
-        name: chart.y_label,
-        nameLocation: "middle",
-      },
-      series,
-      tooltip: {
-        trigger: "axis",
-      },
-    };
-
-    return <ReactECharts option={options} />;
-  }
-
-  if (chart.type === "scatter") {
-    const series = chart.elements.map((e) => {
-      return {
-        name: e.label,
-        type: "scatter",
-        data: e.points.map((p: [number, number]) => [p[0], p[1]]),
-      };
-    });
-
-    const options: EChartsOption = {
-      ...sharedOptions,
-      xAxis: {
-        name: chart.x_label,
-        nameLocation: "middle",
-      },
-      yAxis: {
-        name: chart.y_label,
-        nameLocation: "middle",
-      },
-      series,
-      tooltip: {
-        trigger: "axis",
-      },
-    };
-
-    return <ReactECharts option={options} />;
-  }
-
-  if (chart.type === "bar") {
-    const data = Object.groupBy(chart.elements, ({ group }) => group);
-
-    const series = Object.entries(data).map(([group, elements]) => ({
-      name: group,
-      type: "bar",
-      stack: "total",
-      data: elements?.map((e) => [e.label, e.value]),
-    }));
-
-    const options: EChartsOption = {
-      ...sharedOptions,
-      xAxis: {
-        type: "category",
-        name: chart.x_label,
-        nameLocation: "middle",
-      },
-      yAxis: {
-        name: chart.y_label,
-        nameLocation: "middle",
-      },
-      series,
-      tooltip: {
-        trigger: "axis",
-      },
-    };
-
-    return <ReactECharts option={options} />;
-  }
-
-  if (chart.type === "pie") {
-    const options: EChartsOption = {
-      ...sharedOptions,
-      tooltip: {
-        trigger: "item",
-      },
-      series: [
-        {
-          type: "pie",
-          data: chart.elements.map((e) => ({
-            value: e.angle,
-            name: e.label,
-          })),
-        },
-      ],
-    };
-
-    return <ReactECharts option={options} />;
-  }
-
-  if (chart.type === "box_and_whisker") {
-    const series = chart.elements.map((e) => {
-      return {
-        name: e.label,
-        type: "boxplot",
-        data: [[e.min, e.first_quartile, e.median, e.third_quartile, e.max]],
-      };
-    });
-
-    const options: EChartsOption = {
-      ...sharedOptions,
-      xAxis: {
-        type: "category",
-        name: chart.x_label,
-        nameLocation: "middle",
-      },
-      yAxis: {
-        name: chart.y_label,
-        nameLocation: "middle",
-        min: "dataMin",
-        max: "dataMax",
-      },
-      series,
-      tooltip: {
-        trigger: "item",
-      },
-    };
-
-    return <ReactECharts option={options} />;
-  }
-
-  if (chart.type === "superchart") {
-    return (
-      <div className="grid grid-cols-2 gap-4">
-        {chart.elements.map((e, index) => (
-          <div key={index}>
-            <Chart chart={e} />
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  return <pre>{JSON.stringify(chart, null, 2)}</pre>;
 }

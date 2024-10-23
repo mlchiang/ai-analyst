@@ -9,8 +9,9 @@ export const maxDuration = 30;
 const systemPrompt = `
 You are a sophisticated python data scientist/analyst.
 You are provided with a question and a dataset.
-Generate a python code snippet to be run in a Jupyter notebook that calculates the result and renders a plot.
-You can install additional packages using pip (Jupyter notebook syntax).
+Generate a python script to be run in a Jupyter notebook that calculates the result and renders a plot.
+Only one code block is allowed.
+Install additional packages using !pip syntax.
 
 The following libraries are already installed:
 - jupyter
@@ -39,7 +40,7 @@ export async function POST(req: Request) {
     messages: convertToCoreMessages(filteredMessages),
     // If the provider supports tooling, uncomment below
     // tools: {
-    //   execute_python: {
+    //   runCode: {
     //     description:
     //       "Execute python code in a Jupyter notebook cell and return result",
     //     parameters: z.object({

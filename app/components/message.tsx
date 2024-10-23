@@ -10,7 +10,7 @@ export function MessageComponent({ message }: { message: Message }) {
   return (
     <div
       key={message.id}
-      className={`${message.role === "user" ? "bg-orange-50" : ""}`}
+      className={`px-4 ${message.role === "user" ? "bg-orange-50" : ""}`}
     >
       <div
         className={`flex gap-4 mx-auto w-full max-w-2xl py-4 ${
@@ -33,7 +33,7 @@ export function MessageComponent({ message }: { message: Message }) {
                 return match ? (
                   <SyntaxHighlighter
                     PreTag="div"
-                    className="border text-sm"
+                    className="border text-sm !rounded-xl"
                     language={match[1]}
                     style={oneLight}
                   >

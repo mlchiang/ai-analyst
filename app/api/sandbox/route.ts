@@ -5,7 +5,7 @@ const sandboxTimeout = 10 * 60 * 1000; // 10 minute in ms
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
-  const { code } = await req.json();
+  const code: string = await req.text();
   console.log("Executing code");
 
   const sandbox = await Sandbox.create({
