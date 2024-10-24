@@ -1,6 +1,8 @@
 
 # AI Analyst
 
+(Get inspired by fragments when writing readme https://github.com/e2b-dev/fragments)
+
 AI analyst allows to ...
 
 Tech stack used:
