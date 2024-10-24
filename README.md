@@ -11,4 +11,7 @@ Tech stack used:
 
 ## Run locally
 
-### 1. Step
+### 1. Get E2B API key
+
+### 2. Do Y
+
