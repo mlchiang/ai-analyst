@@ -35,8 +35,8 @@ export function Chart({ chart }: { chart: ChartTypes }) {
     // },
     grid: { top: 30, right: 8, bottom: 28, left: 28 },
     legend: {
-      left: "right",
-      orient: "vertical",
+      // left: "left",
+      // orient: "vertical",
     },
   };
 

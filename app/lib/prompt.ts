@@ -14,6 +14,7 @@ The following libraries are already installed:
 - pandas
 - matplotlib
 - seaborn
+- plotly (not supported yet)
 
 Files:
 ${data.files
