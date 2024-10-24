@@ -14,6 +14,7 @@ Powered by:
 - 🔸 ✶ [E2B Sandbox](https://github.com/e2b-dev/code-interpreter)
 - 🔸 Vercel's AI SDK
 - 🔸 Next.js
+- 🔸 [echarts library](https://echarts.apache.org/en/index.html) for interactive charts
 
 Supported LLM Providers:
 - 🔸 TogetherAI
