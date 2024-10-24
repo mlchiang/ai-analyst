@@ -3,7 +3,7 @@ This is an AI-powered code and data analysis tool built with Next.js and the E2B
 
 ![Preview](preview.png)
 
-→ Try on [analyst.e2b.dev](https://e2b-analyst.vercel.app/)
+→ Try on [ai-analyst.e2b.dev](https://ai-analyst.e2b.dev/)
 
 ## Features
 - 🔸 Analyze data with Meta's Llama 3.1
