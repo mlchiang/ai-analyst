@@ -10,15 +10,18 @@ This is an AI-powered code and data analysis tool built with Next.js and the E2B
 - 🔸 Upload CSV files
 - 🔸 Create interactive charts
 
-Powered by:
+**Powered by:**
 - 🔸 ✶ [E2B Sandbox](https://github.com/e2b-dev/code-interpreter)
 - 🔸 Vercel's AI SDK
 - 🔸 Next.js
 - 🔸 [echarts library](https://echarts.apache.org/en/index.html) for interactive charts
 
-Supported LLM Providers:
+**Supported LLM Providers:**
 - 🔸 TogetherAI
 - 🔸 Fireworks
+
+**Supported chart types:**
+- 🔸 All the supported charts are descriebd [here](https://e2b.dev/docs/code-interpreting/create-charts-visualizations/interactive-charts#supported-intertactive-charts).
 
 **Make sure to give us a star!**
 
