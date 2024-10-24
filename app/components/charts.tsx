@@ -16,9 +16,10 @@ export function RenderResult({
     return <Chart chart={result.extra.chart} />;
   }
 
-  if (result.html) {
-    return <div dangerouslySetInnerHTML={{ __html: result.html }} />;
-  }
+  // Plotly charts are not supported yet
+  // if (result.html) {
+  //   return <div dangerouslySetInnerHTML={{ __html: result.html }} />;
+  // }
 
   return <pre>{JSON.stringify(result, null, 2)}</pre>;
 }
