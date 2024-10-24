@@ -14,7 +14,7 @@ This is an AI-powered code and data analysis tool built with Next.js and the E2B
 - 🔸 ✶ [E2B Sandbox](https://github.com/e2b-dev/code-interpreter)
 - 🔸 Vercel's AI SDK
 - 🔸 Next.js
-- 🔸 [echarts library](https://echarts.apache.org/en/index.html) for interactive charts
+- 🔸 echarts library for interactive charts
 
 **Supported LLM Providers:**
 - 🔸 TogetherAI
