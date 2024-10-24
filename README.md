@@ -1,7 +1,12 @@
 
 # AI Analyst
 
-TODO
+AI analyst allows to ...
+
+Tech stack used:
+- X
+- Y
+- Z
 
 
 ## Run locally
