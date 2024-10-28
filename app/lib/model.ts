@@ -1,4 +1,5 @@
 import { createOpenAI } from "@ai-sdk/openai";
+import { createOllama } from 'ollama-ai-provider'
 
 export type LLMModelConfig = {
   model?: string;
@@ -6,7 +7,7 @@ export type LLMModelConfig = {
   apiKey?: string;
 }
 
-type ProviderName = 'together' | 'fireworks'
+type ProviderName = 'together' | 'fireworks' | 'ollama'
 
 // Default configurations for each provider
 const defaultConfigs = {
@@ -17,6 +18,8 @@ const defaultConfigs = {
   fireworks: {
     baseURL: "https://api.fireworks.ai/inference/v1",
     model: "accounts/fireworks/models/llama-v3p1-405b-instruct"
+  },
+  ollama: {
   }
 };
 
@@ -28,6 +31,8 @@ function getModel(provider: ProviderName, config: LLMModelConfig = {}) {
     case 'together':
     case 'fireworks':
       return createOpenAI({ apiKey, baseURL })(model || defaultConfigs[provider].model);
+    case 'ollama':
+      return createOllama({ baseURL })(model);
     default:
       throw new Error(`Unsupported provider: ${provider}`);
   }
@@ -40,6 +45,10 @@ function getModelFromEnv() {
   });
   if (process.env.FIREWORKS_API_KEY) return getModel("fireworks", {
     apiKey: process.env.FIREWORKS_API_KEY
+  })
+  if (process.env.OLLAMA_BASE_URL) return getModel("ollama", {
+    baseURL: process.env.OLLAMA_BASE_URL,
+    model: process.env.OLLAMA_MODEL
   })
 }
 
