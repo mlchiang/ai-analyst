@@ -43,9 +43,14 @@ cd fragments && npm i
 ```
 
 ### 3. Get API keys
-Set the environment variables in the `.env.local` file. Get your [E2B API key here](https://e2b.dev/dashboard?tab=keys).
-```
-E2B_API_KEY=
-FIREWORKS_API_KEY=
-TOGETHER_AI_API_KEY=
-```
+Copy `.example.env` to `.env.local` and fill in variables for E2B and one LLM provider.
+
+E2B: `E2B_API_KEY`
+
+- Get your [E2B API key here](https://e2b.dev/dashboard?tab=keys).
+
+LLM Providers:
+
+- Fireworks: `FIREWORKS_API_KEY`
+- Together AI: `TOGETHER_API_KEY`
+- Ollama: `OLLAMA_BASE_URL` and `OLLAMA_MODEL`
