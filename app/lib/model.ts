@@ -20,6 +20,7 @@ const defaultConfigs = {
     model: "accounts/fireworks/models/llama-v3p1-405b-instruct"
   },
   ollama: {
+    model: "llama3.2"
   }
 };
 
