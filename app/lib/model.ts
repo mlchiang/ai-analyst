@@ -34,7 +34,7 @@ function getModel(provider: ProviderName, config: LLMModelConfig = {}) : Languag
     case 'fireworks':
       return createOpenAI({ apiKey, baseURL })(model || defaultConfigs[provider].model);
     case 'ollama':
-      return createOllama({ baseURL })(model);
+      return createOllama({ baseURL })(model) as LanguageModelV1;
     default:
       throw new Error(`Unsupported provider: ${provider}`);
   }
