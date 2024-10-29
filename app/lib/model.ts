@@ -1,5 +1,6 @@
 import { createOpenAI } from "@ai-sdk/openai";
 import { createOllama } from 'ollama-ai-provider'
+import { LanguageModelV1 } from "ai"
 
 export type LLMModelConfig = {
   model?: string;
@@ -25,7 +26,7 @@ const defaultConfigs = {
 };
 
 // Function to get a model based on provider and configuration
-function getModel(provider: ProviderName, config: LLMModelConfig = {}) {
+function getModel(provider: ProviderName, config: LLMModelConfig = {}) : LanguageModelV1 {
   const { apiKey, baseURL, model } = { ...defaultConfigs[provider], ...config };
 
   switch (provider) {
@@ -40,7 +41,7 @@ function getModel(provider: ProviderName, config: LLMModelConfig = {}) {
 }
 
 // Determine provider and config based on available environment variables
-function getModelFromEnv() {
+function getModelFromEnv() : LanguageModelV1 {
   if (process.env.TOGETHER_AI_API_KEY) return getModel("together", {
     apiKey: process.env.TOGETHER_AI_API_KEY
   });
@@ -51,6 +52,7 @@ function getModelFromEnv() {
     baseURL: process.env.OLLAMA_BASE_URL,
     model: process.env.OLLAMA_MODEL
   })
+  throw Error("No API keys detected for any of the supported LLM providers.")
 }
 
 export const model = getModelFromEnv()
