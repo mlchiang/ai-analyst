@@ -25,6 +25,8 @@ export default function Home() {
 
   const [filteredModels, setFilteredModels] = useState<LLMModel[] | null>(null);
 
+  const [isLoadingModel, setIsLoadingModel] = useState(true);
+
   useEffect(() => {
     const fetchAndFilterModels = async () => {
       try {
@@ -41,6 +43,7 @@ export default function Home() {
         if (filtered.length > 0) {
           setLanguageModel({ model: filtered[0].id });
         }
+        setIsLoadingModel(false);
       } catch (error) {
         console.error('Error fetching provider list:', error);
       }
@@ -143,7 +146,7 @@ export default function Home() {
           </h1>
         </div>
         <div className="text-sm text-gray-500">
-          Powered by Meta Llama 3.1 405B
+          {isLoadingModel ? "Loading…" : currentModel ? `Powered by Meta ${currentModel.name}` : "No model selected."}
         </div>
       </nav>
       <div className="flex-1 overflow-y-auto pt-14" id="messages">
