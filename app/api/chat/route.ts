@@ -1,6 +1,6 @@
 // import { z } from "zod";
 // import { Sandbox } from "@e2b/code-interpreter";
-import { model } from "@/app/lib/model";
+import { getModel, LLMModel } from "@/app/lib/model";
 import { toPrompt } from "@/app/lib/prompt";
 import { CustomFiles } from "@/app/lib/types";
 import { streamText, convertToCoreMessages, Message } from "ai";
@@ -12,7 +12,7 @@ export async function POST(req: Request) {
   const {
     messages,
     data,
-  }: { messages: Message[]; data: { files: CustomFiles[] } } = await req.json();
+  }: { messages: Message[]; data: { files: CustomFiles[], model: LLMModel } } = await req.json();
   // Filter out tool invocations
   const filteredMessages = messages.map((message) => {
     if (message.toolInvocations) {
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
 
   const result = await streamText({
     system: toPrompt(data),
-    model,
+    model: getModel(data.model),
     messages: convertToCoreMessages(filteredMessages),
     // If the provider supports tooling, uncomment below
     // tools: {

@@ -53,4 +53,4 @@ LLM Providers:
 
 - Fireworks: `FIREWORKS_API_KEY`
 - Together AI: `TOGETHER_API_KEY`
-- Ollama: `OLLAMA_BASE_URL` and `OLLAMA_MODEL`
+- Ollama: `OLLAMA_BASE_URL`

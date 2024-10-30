@@ -5,6 +5,11 @@ import { FileText, PlayIcon, PlusIcon, X } from "lucide-react";
 import { extractCodeFromText } from "./lib/code";
 import Logo from "./components/logo";
 import { useEffect, useState } from "react";
+import modelsList from './lib/models.json'
+import { LLMModelConfig, LLMModel } from './lib/model'
+import { LLMPicker } from './components/llm-picker'
+import { useLocalStorage } from 'usehooks-ts'
+import { getAvailableProviders } from './lib/getAvailableProviders'
 
 export default function Home() {
   const [files, setFiles] = useState<File[]>([]);
@@ -17,6 +22,44 @@ export default function Home() {
         .then((buffer) => Buffer.from(buffer).toString("base64")),
     };
   });
+
+  const [filteredModels, setFilteredModels] = useState<LLMModel[] | null>(null);
+
+  useEffect(() => {
+    const fetchAndFilterModels = async () => {
+      try {
+        const availableProviders = await getAvailableProviders();
+        console.log("Loaded providers:", availableProviders.join(", "));
+        // Filter models based on availableProviders
+        const models = modelsList.models as LLMModel[]
+        if (!models.length) throw Error("There are no providers available.")
+        const filtered = models.filter((model) =>
+          availableProviders.includes(model.providerId)
+        );
+        setFilteredModels(filtered);
+        // Set the first model in the filtered list as the default language model
+        if (filtered.length > 0) {
+          setLanguageModel({ model: filtered[0].id });
+        }
+      } catch (error) {
+        console.error('Error fetching provider list:', error);
+      }
+    };
+
+    fetchAndFilterModels();
+  }, []);
+
+  const [languageModel, setLanguageModel] = useLocalStorage<LLMModelConfig | null>(
+    'languageModel',
+    null,
+  )
+  const currentModel = modelsList.models.find(
+    (model) => model.id === languageModel?.model,
+  )
+
+  function handleLanguageModelChange(e: LLMModelConfig) {
+    setLanguageModel({ ...languageModel, ...e })
+  }
 
   const {
     messages,
@@ -74,9 +117,11 @@ export default function Home() {
 
   async function customSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!currentModel) throw Error("No model is selected.")
     handleSubmit(e, {
       data: {
         files: await Promise.all(filesData),
+        model: currentModel
       },
     });
   }
@@ -127,6 +172,13 @@ export default function Home() {
                 </button>
               </div>
             ))}
+            {filteredModels && languageModel
+              ? filteredModels.length ? <LLMPicker
+                models={filteredModels}
+                languageModel={languageModel}
+                onLanguageModelChange={handleLanguageModelChange}
+              /> : <span className="text-xs text-gray-700">No providers found</span>
+              : <span className="text-xs text-gray-700">Loading…</span>}
           </div>
           <form
             onSubmit={customSubmit}

@@ -2,17 +2,24 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { createOllama } from 'ollama-ai-provider'
 import { LanguageModelV1 } from "ai"
 
+export type ProviderName = 'togetherai' | 'fireworks' | 'ollama'
+
+export type LLMModel = {
+  id: string
+  name: string
+  provider: string
+  providerId: ProviderName
+}
+
 export type LLMModelConfig = {
   model?: string;
   baseURL?: string;
   apiKey?: string;
 }
 
-type ProviderName = 'together' | 'fireworks' | 'ollama'
-
 // Default configurations for each provider
 const defaultConfigs = {
-  together: {
+  togetherai: {
     baseURL: "https://api.together.xyz/v1",
     model: "meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo"
   },
@@ -26,33 +33,27 @@ const defaultConfigs = {
 };
 
 // Function to get a model based on provider and configuration
-function getModel(provider: ProviderName, config: LLMModelConfig = {}) : LanguageModelV1 {
-  const { apiKey, baseURL, model } = { ...defaultConfigs[provider], ...config };
+export function getModel(model: LLMModel, userConfig: LLMModelConfig = {}) : LanguageModelV1 {
+  const config = { ...userConfig, ...defaultConfigs[model.providerId]}
+  const modelId = model.id || config.model;
 
-  switch (provider) {
-    case 'together':
+  switch (model.providerId) {
+    case 'togetherai':
+      return createOpenAI({
+        apiKey: process.env.TOGETHER_AI_API_KEY,
+        ...config
+      })(modelId);
     case 'fireworks':
-      return createOpenAI({ apiKey, baseURL })(model || defaultConfigs[provider].model);
+      return createOpenAI({
+        apiKey: process.env.FIREWORKS_API_KEY,
+        ...config
+      })(modelId);
     case 'ollama':
-      return createOllama({ baseURL })(model) as LanguageModelV1;
+      return createOllama({
+        baseURL: process.env.OLLAMA_BASE_URL,
+        ...config
+      })(modelId) as LanguageModelV1;
     default:
-      throw new Error(`Unsupported provider: ${provider}`);
+      throw new Error(`Unsupported provider: ${model.providerId}`);
   }
 }
-
-// Determine provider and config based on available environment variables
-function getModelFromEnv() : LanguageModelV1 {
-  if (process.env.TOGETHER_AI_API_KEY) return getModel("together", {
-    apiKey: process.env.TOGETHER_AI_API_KEY
-  });
-  if (process.env.FIREWORKS_API_KEY) return getModel("fireworks", {
-    apiKey: process.env.FIREWORKS_API_KEY
-  })
-  if (process.env.OLLAMA_BASE_URL) return getModel("ollama", {
-    baseURL: process.env.OLLAMA_BASE_URL,
-    model: process.env.OLLAMA_MODEL
-  })
-  throw Error("No API keys detected for any of the supported LLM providers.")
-}
-
-export const model = getModelFromEnv()
