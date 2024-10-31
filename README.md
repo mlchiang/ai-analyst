@@ -1,5 +1,5 @@
 # AI Analyst by E2B
-This is an AI-powered code and data analysis tool built with Next.js and the E2B SDK.
+This is an AI-powered code and data analysis tool built with Next.js and the [E2B SDK](https://e2b.dev/docs).
 
 ![Preview](preview.png)
 
