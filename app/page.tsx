@@ -5,11 +5,11 @@ import { FileText, PlayIcon, PlusIcon, X } from "lucide-react";
 import { extractCodeFromText } from "./lib/code";
 import Logo from "./components/logo";
 import { useEffect, useState } from "react";
-import modelsList from './lib/models.json'
-import { LLMModelConfig, LLMModel } from './lib/model'
-import { LLMPicker } from './components/llm-picker'
-import { useLocalStorage } from 'usehooks-ts'
-import { getAvailableProviders } from './lib/getAvailableProviders'
+import modelsList from "./lib/models.json";
+import { LLMModelConfig, LLMModel } from "./lib/model";
+import { LLMPicker } from "./components/llm-picker";
+import { useLocalStorage } from "usehooks-ts";
+import { getAvailableProviders } from "./lib/getAvailableProviders";
 
 export default function Home() {
   const [files, setFiles] = useState<File[]>([]);
@@ -24,8 +24,7 @@ export default function Home() {
   });
 
   const [filteredModels, setFilteredModels] = useState<LLMModel[] | null>(null);
-
-  const [isLoadingModel, setIsLoadingModel] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchAndFilterModels = async () => {
@@ -33,8 +32,8 @@ export default function Home() {
         const availableProviders = await getAvailableProviders();
         console.log("Loaded providers:", availableProviders.join(", "));
         // Filter models based on availableProviders
-        const models = modelsList.models as LLMModel[]
-        if (!models.length) throw Error("There are no providers available.")
+        const models = modelsList.models as LLMModel[];
+        if (!models.length) throw Error("There are no providers available.");
         const filtered = models.filter((model) =>
           availableProviders.includes(model.providerId)
         );
@@ -43,65 +42,59 @@ export default function Home() {
         if (filtered.length > 0) {
           setLanguageModel({ model: filtered[0].id });
         }
-        setIsLoadingModel(false);
       } catch (error) {
-        console.error('Error fetching provider list:', error);
+        console.error("Error fetching provider list:", error);
       }
     };
 
     fetchAndFilterModels();
   }, []);
 
-  const [languageModel, setLanguageModel] = useLocalStorage<LLMModelConfig | null>(
-    'languageModel',
-    null,
-  )
+  const [languageModel, setLanguageModel] =
+    useLocalStorage<LLMModelConfig | null>("languageModel", null);
   const currentModel = modelsList.models.find(
-    (model) => model.id === languageModel?.model,
-  )
+    (model) => model.id === languageModel?.model
+  );
 
   function handleLanguageModelChange(e: LLMModelConfig) {
-    setLanguageModel({ ...languageModel, ...e })
+    setLanguageModel({ ...languageModel, ...e });
   }
 
-  const {
-    messages,
-    input,
-    handleInputChange,
-    handleSubmit,
-    setMessages,
-    isLoading,
-  } = useChat({
-    // Fake tool call
-    onFinish: async (message) => {
-      const code = extractCodeFromText(message.content);
-      if (!code) return;
+  const { messages, input, handleInputChange, handleSubmit, setMessages } =
+    useChat({
+      // Fake tool call
+      onFinish: async (message) => {
+        const code = extractCodeFromText(message.content);
+        if (code) {
+          const res = await fetch("/api/sandbox", {
+            method: "POST",
+            body: JSON.stringify({ code, files: await Promise.all(filesData) }),
+          });
 
-      const res = await fetch("/api/sandbox", {
-        method: "POST",
-        body: JSON.stringify({ code, files: await Promise.all(filesData) }),
-      });
+          const result = await res.json();
 
-      const result = await res.json();
+          // add tool call result to the last message
+          message.toolInvocations = [
+            {
+              state: "result",
+              toolCallId: message.id,
+              toolName: "runCode",
+              args: code,
+              result,
+            },
+          ];
 
-      // add tool call result to the last message
-      message.toolInvocations = [
-        {
-          state: "result",
-          toolCallId: message.id,
-          toolName: "runCode",
-          args: code,
-          result,
-        },
-      ];
+          console.log("Result:", result);
+          setFiles([]);
+          setMessages((prev) => {
+            // replace last message with the new message
+            return [...prev.slice(0, -1), message];
+          });
+        }
 
-      setFiles([]);
-      setMessages((prev) => {
-        // replace last message with the new message
-        return [...prev.slice(0, -1), message];
-      });
-    },
-  });
+        setIsLoading(false);
+      },
+    });
 
   useEffect(() => {
     const messagesElement = document.getElementById("messages");
@@ -120,11 +113,12 @@ export default function Home() {
 
   async function customSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!currentModel) throw Error("No model is selected.")
+    if (!currentModel) throw Error("No model is selected.");
+    setIsLoading(true);
     handleSubmit(e, {
       data: {
         files: await Promise.all(filesData),
-        model: currentModel
+        model: currentModel,
       },
     });
   }
@@ -144,9 +138,6 @@ export default function Home() {
               E2B
             </a>
           </h1>
-        </div>
-        <div className="text-sm text-gray-500">
-          {isLoadingModel ? "Loading…" : currentModel ? `Powered by Meta ${currentModel.name}` : "No model selected."}
         </div>
       </nav>
       <div className="flex-1 overflow-y-auto pt-14" id="messages">
@@ -175,13 +166,26 @@ export default function Home() {
                 </button>
               </div>
             ))}
-            {filteredModels && languageModel
-              ? filteredModels.length ? <LLMPicker
-                models={filteredModels}
-                languageModel={languageModel}
-                onLanguageModelChange={handleLanguageModelChange}
-              /> : <span className="text-xs text-gray-700">No providers found</span>
-              : <span className="text-xs text-gray-700">Loading…</span>}
+          </div>
+          <div className="flex gap-2 justify-between items-end">
+            {filteredModels && languageModel ? (
+              filteredModels.length ? (
+                <LLMPicker
+                  models={filteredModels}
+                  languageModel={languageModel}
+                  onLanguageModelChange={handleLanguageModelChange}
+                />
+              ) : (
+                <span className="text-xs text-gray-700">
+                  No providers found
+                </span>
+              )
+            ) : (
+              <span className="text-xs text-gray-700">Loading…</span>
+            )}
+            {isLoading && (
+              <span className="text-xs text-gray-700">Loading…</span>
+            )}
           </div>
           <form
             onSubmit={customSubmit}
