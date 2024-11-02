@@ -44,10 +44,9 @@ export async function POST(req: Request) {
       //     const sandbox = await Sandbox.create();
 
       //     // Upload files
-      //     data.files.forEach((file) => {
-      //       sandbox.files.write(file.name, atob(file.base64));
-      //     });
-
+      //     for (const file of data.files) {
+      //       await sandbox.files.write(file.name, atob(file.base64));
+      //     }
       //     const { text, results, logs, error } = await sandbox.runCode(code);
       //     console.log(text, results, logs, error);
 
