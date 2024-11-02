@@ -23,6 +23,12 @@ export default function Home() {
     };
   });
 
+  const exampleMessages = [
+    "Person's age born in 2001 as line",
+    "Analyze letters in word strawberry",
+    "Plot a chart of the last 10 years of the S&P 500",
+  ];
+
   const [filteredModels, setFilteredModels] = useState<LLMModel[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -60,41 +66,47 @@ export default function Home() {
     setLanguageModel({ ...languageModel, ...e });
   }
 
-  const { messages, input, handleInputChange, handleSubmit, setMessages } =
-    useChat({
-      // Fake tool call
-      onFinish: async (message) => {
-        const code = extractCodeFromText(message.content);
-        if (code) {
-          const res = await fetch("/api/sandbox", {
-            method: "POST",
-            body: JSON.stringify({ code, files: await Promise.all(filesData) }),
-          });
+  const {
+    messages,
+    input,
+    handleInputChange,
+    handleSubmit,
+    setMessages,
+    setInput,
+  } = useChat({
+    // Fake tool call
+    onFinish: async (message) => {
+      const code = extractCodeFromText(message.content);
+      if (code) {
+        const res = await fetch("/api/sandbox", {
+          method: "POST",
+          body: JSON.stringify({ code, files: await Promise.all(filesData) }),
+        });
 
-          const result = await res.json();
+        const result = await res.json();
 
-          // add tool call result to the last message
-          message.toolInvocations = [
-            {
-              state: "result",
-              toolCallId: message.id,
-              toolName: "runCode",
-              args: code,
-              result,
-            },
-          ];
+        // add tool call result to the last message
+        message.toolInvocations = [
+          {
+            state: "result",
+            toolCallId: message.id,
+            toolName: "runCode",
+            args: code,
+            result,
+          },
+        ];
 
-          console.log("Result:", result);
-          setFiles([]);
-          setMessages((prev) => {
-            // replace last message with the new message
-            return [...prev.slice(0, -1), message];
-          });
-        }
+        console.log("Result:", result);
+        setFiles([]);
+        setMessages((prev) => {
+          // replace last message with the new message
+          return [...prev.slice(0, -1), message];
+        });
+      }
 
-        setIsLoading(false);
-      },
-    });
+      setIsLoading(false);
+    },
+  });
 
   useEffect(() => {
     const messagesElement = document.getElementById("messages");
@@ -167,6 +179,19 @@ export default function Home() {
               </div>
             ))}
           </div>
+          {messages.length === 0 && files.length === 0 && (
+            <div className="flex gap-2 overflow-x-auto">
+              {exampleMessages.map((msg) => (
+                <button
+                  key={msg}
+                  className="flex items-center gap-2 p-1.5 border rounded-lg text-gray-800"
+                  onClick={(e) => setInput(msg)}
+                >
+                  <span className="text-sm truncate">{msg}</span>
+                </button>
+              ))}
+            </div>
+          )}
           <div className="flex gap-2 justify-between items-end">
             {filteredModels && languageModel ? (
               filteredModels.length ? (
