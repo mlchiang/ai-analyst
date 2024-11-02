@@ -185,7 +185,7 @@ export default function Home() {
                 <button
                   key={msg}
                   className="flex items-center gap-2 p-1.5 border rounded-lg text-gray-800"
-                  onClick={(e) => setInput(msg)}
+                  onClick={() => setInput(msg)}
                 >
                   <span className="text-sm truncate">{msg}</span>
                 </button>
