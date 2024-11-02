@@ -1,4 +1,5 @@
 import { CustomFiles } from "./types";
+import { preProcessFile } from "./preprocess";
 
 export function toPrompt(data: { files: CustomFiles[] }) {
   return `
@@ -18,7 +19,9 @@ The following libraries are already installed:
 
 Files:
 ${data.files
-  .map((file) => `${file.name}\n\n${atob(file.base64)}\n\n`)
+  .map(
+    (file) => `${file.name}\n\n${preProcessFile(file.name, file.base64)}\n\n`
+  )
   .join("\n")}
 `;
 }
