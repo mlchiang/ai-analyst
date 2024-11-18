@@ -1,15 +1,15 @@
 "use client";
 import { useChat } from "ai/react";
-import { MessageComponent } from "./components/message";
+import { MessageComponent } from "@/components/message";
 import { FileText, PlayIcon, PlusIcon, X } from "lucide-react";
-import { extractCodeFromText } from "./lib/code";
-import Logo from "./components/logo";
+import { extractCodeFromText } from "@/lib/code";
+import Logo from "@/components/logo";
 import { useEffect, useState } from "react";
-import modelsList from "./lib/models.json";
-import { LLMModelConfig, LLMModel } from "./lib/model";
-import { LLMPicker } from "./components/llm-picker";
+import modelsList from "@/lib/models.json";
+import { LLMModelConfig } from "@/lib/model";
+import { LLMPicker, LLMSettings } from "@/components/llm-picker";
 import { useLocalStorage } from "usehooks-ts";
-import { getAvailableProviders } from "./lib/getAvailableProviders";
+import { preProcessFile } from "@/lib/preprocess";
 
 export default function Home() {
   const [files, setFiles] = useState<File[]>([]);
@@ -17,9 +17,7 @@ export default function Home() {
     return {
       name: file.name,
       contentType: file.type,
-      base64: await file
-        .arrayBuffer()
-        .then((buffer) => Buffer.from(buffer).toString("base64")),
+      content: await preProcessFile(file),
     };
   });
 
@@ -29,37 +27,16 @@ export default function Home() {
     "Plot a chart of the last 10 years of the S&P 500",
   ];
 
-  const [filteredModels, setFilteredModels] = useState<LLMModel[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [languageModel, setLanguageModel] = useLocalStorage<LLMModelConfig>(
+    "languageModel",
+    {
+      model: "accounts/fireworks/models/llama-v3p1-405b-instruct",
+    }
+  );
 
-  useEffect(() => {
-    const fetchAndFilterModels = async () => {
-      try {
-        const availableProviders = await getAvailableProviders();
-        console.log("Loaded providers:", availableProviders.join(", "));
-        // Filter models based on availableProviders
-        const models = modelsList.models as LLMModel[];
-        if (!models.length) throw Error("There are no providers available.");
-        const filtered = models.filter((model) =>
-          availableProviders.includes(model.providerId)
-        );
-        setFilteredModels(filtered);
-        // Set the first model in the filtered list as the default language model
-        if (filtered.length > 0) {
-          setLanguageModel({ model: filtered[0].id });
-        }
-      } catch (error) {
-        console.error("Error fetching provider list:", error);
-      }
-    };
-
-    fetchAndFilterModels();
-  }, []);
-
-  const [languageModel, setLanguageModel] =
-    useLocalStorage<LLMModelConfig | null>("languageModel", null);
   const currentModel = modelsList.models.find(
-    (model) => model.id === languageModel?.model
+    (model) => model.id === languageModel.model
   );
 
   function handleLanguageModelChange(e: LLMModelConfig) {
@@ -131,6 +108,7 @@ export default function Home() {
       data: {
         files: await Promise.all(filesData),
         model: currentModel,
+        config: languageModel,
       },
     });
   }
@@ -193,21 +171,19 @@ export default function Home() {
             </div>
           )}
           <div className="flex gap-2 justify-between items-end">
-            {filteredModels && languageModel ? (
-              filteredModels.length ? (
-                <LLMPicker
-                  models={filteredModels}
-                  languageModel={languageModel}
-                  onLanguageModelChange={handleLanguageModelChange}
-                />
-              ) : (
-                <span className="text-xs text-gray-700">
-                  No providers found
-                </span>
-              )
-            ) : (
-              <span className="text-xs text-gray-700">Loading…</span>
-            )}
+            <div className="flex gap-2">
+              <LLMPicker
+                models={modelsList.models}
+                languageModel={languageModel}
+                onLanguageModelChange={handleLanguageModelChange}
+              />
+              <LLMSettings
+                apiKeyConfigurable={!process.env.NEXT_PUBLIC_NO_API_KEY_INPUT}
+                baseURLConfigurable={!process.env.NEXT_PUBLIC_NO_BASE_URL_INPUT}
+                languageModel={languageModel}
+                onLanguageModelChange={handleLanguageModelChange}
+              />
+            </div>
             {isLoading && (
               <span className="text-xs text-gray-700">Loading…</span>
             )}

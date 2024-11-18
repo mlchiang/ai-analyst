@@ -1,5 +1,4 @@
 import { CustomFiles } from "./types";
-import { preProcessFile } from "./preprocess";
 
 export function toPrompt(data: { files: CustomFiles[] }) {
   return `
@@ -18,10 +17,6 @@ The following libraries are already installed:
 - plotly (not supported yet)
 
 Files:
-${data.files
-  .map(
-    (file) => `${file.name}\n\n${preProcessFile(file.name, file.base64)}\n\n`
-  )
-  .join("\n")}
+${data.files.map((file) => `${file.name}\n\n${file.content}\n\n`).join("\n")}
 `;
 }

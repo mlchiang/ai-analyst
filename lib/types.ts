@@ -8,5 +8,5 @@ export type ToolResult = (ToolInvocation & {
 export type CustomFiles = {
   name: string;
   contentType: string;
-  base64: string;
+  content: string;
 };
