@@ -7,7 +7,8 @@ import Logo from "@/components/logo";
 import { useEffect, useState } from "react";
 import modelsList from "@/lib/models.json";
 import { LLMModelConfig } from "@/lib/model";
-import { LLMPicker, LLMSettings } from "@/components/llm-picker";
+import { LLMPicker } from "@/components/llm-picker";
+import { LLMSettings } from "@/components/llm-settings";
 import { useLocalStorage } from "usehooks-ts";
 import { preProcessFile } from "@/lib/preprocess";
 
