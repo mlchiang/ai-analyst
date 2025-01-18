@@ -3,8 +3,8 @@ import { Separator } from "./ui/separator";
 import { cn } from "@/lib/utils";
 import { StarFilledIcon } from "@radix-ui/react-icons";
 
-const REPO_URL = "https://github.com/e2b-dev/fragments";
-const REPO_DATA_URL = "https://api.github.com/repos/e2b-dev/fragments";
+const REPO_URL = "https://github.com/e2b-dev/ai-analyst";
+const REPO_DATA_URL = "https://api.github.com/repos/e2b-dev/ai-analyst";
 
 // Refetch GitHub Repo Data every hour
 export const revalidate = 60 * 60;
@@ -22,7 +22,7 @@ export async function RepoBanner() {
       aria-label={`View Fragments repository on GitHub - ${repoData.stargazers_count} stars`}
       className={cn(
         "bg-background overflow-hidden hover:scale-[1.01] font-light px-3 py-1.5 rounded-2xl",
-        "gap-2 w-fit flex items-center shadow-md mt-auto mb-2 ml-2 border",
+        "gap-2 w-fit flex items-center shadow-sm ml-auto border",
         "transition-all duration-300 group relative",
         "before:absolute before:w-full before:h-full before:bg-[radial-gradient(circle_at_50%_-50%,rgba(255,255,255,0.1),transparent_70%)] dark:before:bg-[radial-gradient(circle_at_50%_-100%,rgba(255,255,255,0.1),transparent_70%)] before:rounded-2xl before:pointer-events-none"
       )}
@@ -33,7 +33,7 @@ export async function RepoBanner() {
         className="h-6 bg-[hsl(var(--border))]"
         aria-hidden="true"
       />
-      <p className="text-sm font-light text-muted-foreground tracking-wide">
+      <p className="text-xs font-light text-muted-foreground tracking-wide">
         Star on GitHub
       </p>
       <div
