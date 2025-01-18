@@ -25,7 +25,7 @@ export function RepoBanner() {
         className="h-6 bg-[hsl(var(--border))]"
         aria-hidden="true"
       />
-      <p className="text-xs font-light text-muted-foreground tracking-wide">
+      <p className="text-xs md:text-sm font-light text-foreground tracking-wide">
         Star on GitHub
       </p>
       <div

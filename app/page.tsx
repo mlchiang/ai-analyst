@@ -118,7 +118,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen max-h-screen">
-      <nav className="flex gap-0.5 justify-between items-center p-4 top-0 fixed left-0 right-0 bg-white/80 backdrop-blur-sm shadow-sm z-10">
+      <nav className="flex gap-0.5 justify-between items-center px-4 py-3 top-0 fixed left-0 right-0 bg-white/80 backdrop-blur-sm shadow-sm z-10">
         <div className="flex items-center gap-2 w-full max-w-2xl mx-auto">
           <Logo className="w-6 h-6" />
           <h1 className="text-md font-medium">
@@ -219,7 +219,7 @@ export default function Home() {
             </button>
           </form>
           {messages.length === 0 && files.length === 0 && (
-            <div className="flex gap-2 overflow-x-auto scrollbar-thin pr-4 [mask-image:linear-gradient(to_right,transparent,black_0%,black_95%,transparent)]">
+            <div className="flex gap-2 mb-4 pb-1 overflow-x-auto scrollbar-thin pr-4 [mask-image:linear-gradient(to_right,transparent,black_0%,black_95%,transparent)]">
               {exampleMessages.map((msg) => (
                 <button
                   key={msg}
