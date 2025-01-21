@@ -1,6 +1,12 @@
 {
   "models": [
     {
+      "id": "o1",
+      "provider": "OpenAI",
+      "providerId": "openai",
+      "name": "o1"
+    },
+    {
       "id": "accounts/fireworks/models/llama-v3p1-405b-instruct",
       "provider": "Fireworks",
       "providerId": "fireworks",
