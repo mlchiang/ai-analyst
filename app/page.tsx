@@ -12,17 +12,10 @@ import { LLMModelConfig } from "@/lib/model";
 import { LLMPicker } from "@/components/llm-picker";
 import { LLMSettings } from "@/components/llm-settings";
 import { useLocalStorage } from "usehooks-ts";
-import { preProcessFile } from "@/lib/preprocess";
+import { toUploadableFile } from "@/lib/utils";
 
 export default function Home() {
   const [files, setFiles] = useState<File[]>([]);
-  const filesData = files.map(async (file) => {
-    return {
-      name: file.name,
-      contentType: file.type,
-      content: await preProcessFile(file),
-    };
-  });
 
   const exampleMessages = [
     "Person's age born in 2001 as line",
@@ -60,7 +53,10 @@ export default function Home() {
       if (code) {
         const res = await fetch("/api/sandbox", {
           method: "POST",
-          body: JSON.stringify({ code, files: await Promise.all(filesData) }),
+          body: JSON.stringify({
+            code,
+            files: await Promise.all(files.map((f) => toUploadableFile(f))),
+          }),
         });
 
         const result = await res.json();
@@ -109,7 +105,9 @@ export default function Home() {
     setIsLoading(true);
     handleSubmit(e, {
       data: {
-        files: await Promise.all(filesData),
+        files: await Promise.all(
+          files.map((f) => toUploadableFile(f, { cutOff: 5 }))
+        ),
         model: currentModel,
         config: languageModel,
       },
