@@ -134,6 +134,7 @@ export default function Home() {
           <RepoBanner />
         </div>
       </nav>
+
       <div className="flex-1 overflow-y-auto pt-14" id="messages">
         {messages.map((m) => (
           <MessageComponent key={m.id} message={m} />
@@ -143,6 +144,19 @@ export default function Home() {
       <div className="mb-4 mx-4">
         <div className="mx-auto w-full max-w-2xl flex flex-col gap-2">
           <div className="flex gap-2 overflow-x-auto">
+            {messages.length === 0 && files.length === 0 && (
+              <div className="flex gap-2 overflow-x-auto scrollbar-thin pb-1 pr-4 [mask-image:linear-gradient(to_right,transparent,black_0%,black_95%,transparent)]">
+                {exampleMessages.map((msg) => (
+                  <button
+                    key={msg}
+                    className="flex items-center gap-2 p-1.5 border rounded-lg text-gray-800"
+                    onClick={() => setInput(msg)}
+                  >
+                    <span className="text-sm truncate">{msg}</span>
+                  </button>
+                ))}
+              </div>
+            )}
             {files.map((file) => (
               <div
                 key={file.name}
@@ -218,19 +232,6 @@ export default function Home() {
               <PlayIcon className="w-5 h-5" />
             </button>
           </form>
-          {messages.length === 0 && files.length === 0 && (
-            <div className="flex gap-2 mb-4 pb-1 overflow-x-auto scrollbar-thin pr-4 [mask-image:linear-gradient(to_right,transparent,black_0%,black_95%,transparent)]">
-              {exampleMessages.map((msg) => (
-                <button
-                  key={msg}
-                  className="flex items-center gap-2 p-1.5 border rounded-lg text-gray-800"
-                  onClick={() => setInput(msg)}
-                >
-                  <span className="text-sm truncate">{msg}</span>
-                </button>
-              ))}
-            </div>
-          )}
         </div>
       </div>
     </div>
