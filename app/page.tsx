@@ -46,7 +46,7 @@ export default function Home() {
   const [languageModel, setLanguageModel] = useLocalStorage<LLMModelConfig>(
     "languageModel",
     {
-      model: "accounts/fireworks/models/llama-v3p1-405b-instruct",
+      model: "meta-llama/Llama-3.3-70B-Instruct-Turbo",
     }
   );
 
