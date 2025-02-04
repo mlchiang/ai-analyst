@@ -36,6 +36,22 @@ interface ToolOutput {
   title?: string;
 }
 
+// Add these interfaces near the top with other interfaces
+interface SandboxResult {
+  png?: string;
+  extra?: {
+    chart?: {
+      title?: string;
+      [key: string]: unknown;
+    };
+  };
+}
+
+interface SandboxResponse {
+  results?: SandboxResult[];
+  output?: string;
+}
+
 // Move the client initialization outside the component
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -93,7 +109,7 @@ export default function Home() {
             }),
           });
           console.log('Sandbox API response status:', res.status);
-          const result = await res.json();
+          const result: SandboxResponse = await res.json();
           console.log('Sandbox execution result:', result);
 
           // Structure the tool invocation results to include plots with proper metadata
@@ -104,7 +120,7 @@ export default function Home() {
             args: code,
             result: {
               type: "success" as const,
-              results: result.results?.map((item: any, index: number) => ({
+              results: result.results?.map((item: SandboxResult, index: number) => ({
                 ...item,
                 extra: {
                   chart: {

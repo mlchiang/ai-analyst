@@ -1,5 +1,6 @@
 import { ChartTypes, Result } from "@e2b/code-interpreter";
 import ReactECharts, { EChartsOption } from "echarts-for-react";
+import Image from 'next/image';
 
 export function RenderResult({
   result,
@@ -9,7 +10,14 @@ export function RenderResult({
   viewMode: "static" | "interactive";
 }) {
   if (viewMode === "static" && result.png) {
-    return <img src={`data:image/png;base64,${result.png}`} alt="plot" />;
+    return (
+      <Image 
+        src={`data:image/png;base64,${result.png}`} 
+        alt="plot" 
+        width={500}
+        height={300}
+      />
+    );
   }
 
   if (viewMode === "interactive" && result.extra?.chart) {
