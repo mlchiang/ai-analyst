@@ -6,7 +6,7 @@ import { AlertTriangle, ChartNoAxesCombined } from "lucide-react";
 
 export function ToolOutput({ result }: { result: ToolResult | undefined }) {
   const [viewMode, setViewMode] = useState<"static" | "interactive">(
-    "interactive"
+    "static"
   );
 
   if (!result) return null;
@@ -31,7 +31,7 @@ export function ToolOutput({ result }: { result: ToolResult | undefined }) {
           <ChartNoAxesCombined className="w-4 h-4" />
           {result.extra?.chart.title}
         </div>
-        <div className="flex justify-end border rounded-lg overflow-hidden">
+        {/* <div className="flex justify-end border rounded-lg overflow-hidden">
           <button
             className={`px-3 py-2 font-semibold text-sm ${
               viewMode === "static" ? "bg-orange-500/10 text-orange-500" : ""
@@ -50,7 +50,7 @@ export function ToolOutput({ result }: { result: ToolResult | undefined }) {
           >
             Interactive
           </button>
-        </div>
+        </div> */}
       </div>
       <div className="p-4">
         <RenderResult result={result} viewMode={viewMode} />

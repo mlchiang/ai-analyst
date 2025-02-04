@@ -29,6 +29,13 @@ interface PlayerData extends Player {
   season: number;
 }
 
+// Add this interface at the top with other interfaces
+interface ToolOutput {
+  type: "text" | "plot";
+  content: string;
+  title?: string;
+}
+
 // Move the client initialization outside the component
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -89,16 +96,49 @@ export default function Home() {
           const result = await res.json();
           console.log('Sandbox execution result:', result);
 
-          // add tool call result to the last message
-          message.toolInvocations = [
-            {
-              state: "result",
-              toolCallId: message.id,
-              toolName: "runCode",
-              args: code,
-              result,
-            },
-          ];
+          // Structure the tool invocation results to include plots with proper metadata
+          const toolInvocation = {
+            state: "result" as const,
+            toolCallId: message.id,
+            toolName: "runCode",
+            args: code,
+            result: {
+              type: "success" as const,
+              results: result.results?.map((item: any, index: number) => ({
+                ...item,
+                extra: {
+                  chart: {
+                    title: `Plot ${index + 1}`, // Add a default title
+                    ...item.extra?.chart // Preserve any existing chart metadata
+                  }
+                }
+              })) || [],
+              output: result.output || ''
+            }
+          };
+
+          // // Add any text output
+          // if (result.output) {
+          //   toolInvocation.result.outputs.push({
+          //     type: "text",
+          //     content: result.output
+          //   });
+          // }
+
+          // // Add any plots as images
+          // if (result.results) {
+          //   result.results.forEach((item: any, index: number) => {
+          //     if (item.png) {
+          //       toolInvocation.result.outputs.push({
+          //         type: "plot",
+          //         title: `Plot ${index + 1}`,
+          //         content: item.png
+          //       });
+          //     }
+          //   });
+          // }
+
+          message.toolInvocations = [toolInvocation];
 
           console.log("Tool invocation created:", message.toolInvocations[0]);
           setFiles([]);
