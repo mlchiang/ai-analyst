@@ -36,7 +36,7 @@ export async function POST(req: Request) {
   const modelClient = getModelClient(data.model, data.config);
 
   const result = await streamText({
-    system: toPrompt(data),
+    system: await toPrompt(data),
     model: modelClient as LanguageModelV1,
     messages: convertToCoreMessages(filteredMessages),
     ...modelParams,

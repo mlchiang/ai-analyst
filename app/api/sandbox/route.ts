@@ -1,5 +1,6 @@
 import { CustomFiles } from "@/lib/types";
 import Sandbox from "@e2b/code-interpreter";
+import fs from 'fs/promises';
 
 const sandboxTimeout = 10 * 60 * 1000; // 10 minute in ms
 
@@ -15,13 +16,40 @@ export async function POST(req: Request) {
     timeoutMs: sandboxTimeout,
   });
 
-  // Upload files
+  const coreFiles = [
+    {
+      name: "weekly_offense_player_stats.csv",
+      path: "public/data/weekly_offense_player_stats.csv"
+    },
+    // {
+    //   name: "nfl_2024_pbp.csv",
+    //   path: "public/data/nfl_2024_pbp.csv"
+    // },
+    // {
+    //   name: "nfl_2024_players.csv",
+    //   path: "public/data/nfl_2024_players.csv"
+    // },
+    // {
+    //   name: "nfl_2024_teams.csv",
+    //   path: "public/data/nfl_2024_teams.csv"
+    // }
+  ];
+
+  // Upload core files to public/data directory
+  for (const file of coreFiles) {
+    const content = await fs.readFile(file.path, 'utf-8');
+    // Write the complete file content to the sandbox
+    await sandbox.files.write(`${file.name}`, content);
+  }
+
+  // Upload any additional files to public/data directory
   for (const file of files) {
     await sandbox.files.write(file.name, file.content);
   }
 
-  const { text, results, logs, error } = await sandbox.runCode(code);
-
+  const { text, results, logs, error } = await sandbox.runCode(code, { language: 'r' });
+  
+  
   return new Response(
     JSON.stringify({
       text,

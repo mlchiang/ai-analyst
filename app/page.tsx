@@ -29,6 +29,12 @@ interface PlayerData extends Player {
   season: number;
 }
 
+// Move the client initialization outside the component
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
 export default function Home() {
   const [files, setFiles] = useState<File[]>([]);
   const [searchResults, setSearchResults] = useState<Player[]>([]);
@@ -54,11 +60,6 @@ export default function Home() {
     (model) => model.id === languageModel.model
   );
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-
   function handleLanguageModelChange(e: LLMModelConfig) {
     setLanguageModel({ ...languageModel, ...e });
   }
@@ -71,37 +72,46 @@ export default function Home() {
     setMessages,
     setInput,
   } = useChat({
-    // Fake tool call
     onFinish: async (message) => {
+      console.log('onFinish triggered, message:', message);
       const code = extractCodeFromText(message.content);
       if (code) {
-        const res = await fetch("/api/sandbox", {
-          method: "POST",
-          body: JSON.stringify({
-            code,
-            files: await Promise.all(files.map((f) => toUploadableFile(f))),
-          }),
-        });
+        console.log('Extracted code:', code);
+        try {
+          const res = await fetch("/api/sandbox", {
+            method: "POST",
+            body: JSON.stringify({
+              code,
+              files: await Promise.all(files.map((f) => toUploadableFile(f))),
+            }),
+          });
+          console.log('Sandbox API response status:', res.status);
+          const result = await res.json();
+          console.log('Sandbox execution result:', result);
 
-        const result = await res.json();
+          // add tool call result to the last message
+          message.toolInvocations = [
+            {
+              state: "result",
+              toolCallId: message.id,
+              toolName: "runCode",
+              args: code,
+              result,
+            },
+          ];
 
-        // add tool call result to the last message
-        message.toolInvocations = [
-          {
-            state: "result",
-            toolCallId: message.id,
-            toolName: "runCode",
-            args: code,
-            result,
-          },
-        ];
-
-        console.log("Result:", result);
-        setFiles([]);
-        setMessages((prev) => {
-          // replace last message with the new message
-          return [...prev.slice(0, -1), message];
-        });
+          console.log("Tool invocation created:", message.toolInvocations[0]);
+          setFiles([]);
+          setMessages((prev) => {
+            const newMessages = [...prev.slice(0, -1), message];
+            console.log('Updated messages:', newMessages);
+            return newMessages;
+          });
+        } catch (error) {
+          console.error('Error in sandbox execution:', error);
+        }
+      } else {
+        console.log('No code extracted from message');
       }
 
       setIsLoading(false);
@@ -123,9 +133,10 @@ export default function Home() {
     setFiles((prev) => prev.filter((f) => f !== file));
   }
 
-  async function customSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const customSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!currentModel) throw Error("No model is selected.");
+    console.log('Starting submission...');
     setIsLoading(true);
     handleSubmit(e, {
       data: {
@@ -136,7 +147,7 @@ export default function Home() {
         config: languageModel,
       },
     });
-  }
+  };
 
   const handlePlayerSearch = async (query: string) => {
     const { data, error } = await supabase
@@ -156,13 +167,13 @@ export default function Home() {
         }, new Map())
         .values();
 
-      // Convert to array, take first 5
+      // Convert to array, take first 5, and handle NA headshot URLs
       setSearchResults(Array.from<PlayerData>(uniquePlayers)
         .slice(0, 5)
         .map(({ full_name, gsis_id, headshot_url }) => ({
           full_name,
           gsis_id,
-          headshot_url
+          headshot_url: headshot_url === 'NA' ? '/default-avatar.png' : headshot_url
         })));
     }
   };
@@ -335,14 +346,11 @@ export default function Home() {
                   ref={inputRef}
                   autoFocus
                   required
-                  className="w-full px-2 outline-none absolute inset-0 bg-transparent"
+                  className="w-full px-2 outline-none bg-transparent"
                   value={input}
                   placeholder="Enter your prompt..."
                   onChange={handleInputChange}
                 />
-                <div className="w-full px-2 pointer-events-none">
-                  {getHighlightedText() || <span className="text-gray-400">Enter your prompt...</span>}
-                </div>
               </div>
               {showPlayerSearch && (
                 <div 
@@ -367,8 +375,12 @@ export default function Home() {
                               src={player.headshot_url || '/default-avatar.png'}
                               alt={player.full_name}
                               fill
-                              className="object-cover object-[50%_35%]" // Center the face in the avatar
+                              className="object-cover object-[50%_35%]"
                               unoptimized
+                              onError={(e) => {
+                                // Fallback to default avatar if image fails to load
+                                (e.target as HTMLImageElement).src = '/default-avatar.png';
+                              }}
                             />
                           </div>
                         </Avatar>
