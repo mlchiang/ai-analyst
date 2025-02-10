@@ -9,7 +9,7 @@ const codeExecutionTimeout = 5 * 60 * 1000; // 5 minutes in ms
 export const maxDuration = 600; // 10 minutes
 
 export async function POST(req: Request) {
-  let sandbox: any;
+  let sandbox: Sandbox | undefined;
   
   try {
     const { code, files }: { code: string; files: CustomFiles[] } =
