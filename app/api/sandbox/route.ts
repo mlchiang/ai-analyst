@@ -22,7 +22,7 @@ export async function POST(req: Request) {
   const coreFiles = [
     {
       name: "weekly_offense_player_stats.csv",
-      path: "public/data/weekly_offense_player_stats.csv"
+      path: "https://auth.fantasyplaybook.ai/storage/v1/object/public/nfl-data//weekly_offense_player_stats.csv"
     },
     // {
     //   name: "nfl_2024_pbp.csv",
