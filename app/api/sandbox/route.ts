@@ -91,14 +91,15 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   } finally {
-    if (sandbox?.dispose) {
-      try {
-        console.log("Disposing sandbox...");
-        await sandbox.dispose();
-        console.log("Sandbox disposed successfully");
-      } catch (error) {
-        console.error('Error disposing sandbox:', error);
-      }
+    if (sandbox) {
+      // try {
+      //   console.log("Disposing sandbox...");
+      //   // Use type assertion since dispose exists at runtime
+      //   await (sandbox as unknown as { dispose(): Promise<void> }).dispose();
+      //   console.log("Sandbox disposed successfully");
+      // } catch (error) {
+      //   console.error('Error disposing sandbox:', error);
+      // }
     }
   }
 }
