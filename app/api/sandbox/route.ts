@@ -6,6 +6,17 @@ const sandboxTimeout = 10 * 60 * 1000; // 10 minute in ms
 
 export const maxDuration = 60;
 
+async function fetchFileContent(path: string): Promise<string> {
+  if (path.startsWith('http')) {
+    const response = await fetch(path);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch ${path}: ${response.statusText}`);
+    }
+    return response.text();
+  }
+  return fs.readFile(path, 'utf-8');
+}
+
 export async function POST(req: Request) {
   const { code, files }: { code: string; files: CustomFiles[] } =
     await req.json();
@@ -40,7 +51,7 @@ export async function POST(req: Request) {
 
   // Upload core files to public/data directory
   for (const file of coreFiles) {
-    const content = await fs.readFile(file.path, 'utf-8');
+    const content = await fetchFileContent(file.path);
     // Write the complete file content to the sandbox
     await sandbox.files.write(`${file.name}`, content);
   }
@@ -51,7 +62,6 @@ export async function POST(req: Request) {
   }
 
   const { text, results, logs, error } = await sandbox.runCode(code, { language: 'r' });
-  
   
   return new Response(
     JSON.stringify({

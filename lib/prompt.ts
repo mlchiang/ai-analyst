@@ -20,11 +20,22 @@ const coreFiles = [
   // }
 ];
 
+async function fetchFileContent(path: string): Promise<string> {
+  if (path.startsWith('http')) {
+    const response = await fetch(path);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch ${path}: ${response.statusText}`);
+    }
+    return response.text();
+  }
+  return fs.readFile(path, 'utf-8');
+}
+
 export async function toPrompt(data: { files: CustomFiles[] }) {
   // Get column names for each file
   const fileDescriptions = await Promise.all(
     coreFiles.map(async (file) => {
-      const content = await fs.readFile(file.path, 'utf-8');
+      const content = await fetchFileContent(file.path);
       const headers = content.split('\n')[0];
       return `- ${file.name} (columns: ${headers})`;
     })
