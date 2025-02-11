@@ -55,7 +55,8 @@ Charts should display temporal progression, with either 'Week' or 'Season' on th
 Sort the data by week or season
 Convert week or season numbers to numeric type
 Handle any missing weeks or seasons appropriately
-You can use nflplotR::geom_nfl_headshots(aes(player_gsis = player_gsis), height = 0.2, alpha = 0.5) to add player headshots to a plot.
+You can use nflplotR::geom_nfl_headshots(aes(player_gsis = player_gsis), height = 0.2, alpha = 0.5) to add player headshots to a plot. 
+Don't forget to install the nflplotR package when using geom_nfl_headshots or geom_nfl_logos.
 
 I will also provide you with types of charts you can create and code to create them.
 
@@ -66,6 +67,7 @@ library(nflplotR)
 library(nflreadr)
 library(grid)
 library(ggtext)
+libryar(nflplotR)
 
 # data loading and wrangling copied from: https://www.nflfastr.com/articles/beginners_guide.html#figures-with-qb-stats
 pbp <- nflreadr::load_pbp(2024) %>%

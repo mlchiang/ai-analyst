@@ -7,9 +7,7 @@ import { streamText, convertToCoreMessages, Message, LanguageModelV1 } from "ai"
 
 // Allow streaming responses up to 60 seconds
 export const maxDuration = 60;
-// Add response size limits
 export const runtime = 'edge'; // Use edge runtime for better streaming
-export const maxResponseSize = 1024 * 1024; // 1MB limit for responses
 
 export async function POST(req: Request) {
   const {
